@@ -584,15 +584,22 @@ class CronMonitorSystem:
                         suggested_response=f"Respond with {opp['suggested_response_type']} within {self._get_response_timeframe(opp['time_sensitivity'])}"
                     )
                     
-                    # Generate content for this opportunity
-                    await self._generate_opportunity_content(alert_opp)
-                    
-                    # Create feedback tracking for this opportunity
-                    feedback_id = self.feedback_tracker.create_opportunity_tracking(alert_opp.to_dict())
-                    alert_opp.feedback_id = feedback_id
-                    alert_opp.feedback_urls = self.feedback_tracker.generate_feedback_urls(feedback_id)
-                    
-                    processed.append(alert_opp)
+                    # Check for duplicates before processing
+                    if not self._is_opportunity_processed(alert_opp):
+                        # Generate content for this opportunity
+                        await self._generate_opportunity_content(alert_opp)
+                        
+                        # Create feedback tracking for this opportunity
+                        feedback_id = self.feedback_tracker.create_opportunity_tracking(alert_opp.to_dict())
+                        alert_opp.feedback_id = feedback_id
+                        alert_opp.feedback_urls = self.feedback_tracker.generate_feedback_urls(feedback_id)
+                        
+                        # Mark as processed to prevent future duplicates
+                        self._mark_opportunity_processed(alert_opp)
+                        processed.append(alert_opp)
+                        logger.debug(f"New strategic opportunity: {alert_opp.content_url}")
+                    else:
+                        logger.debug(f"Skipping duplicate strategic opportunity: {alert_opp.content_url}")
                     
                 elif 'keyword' in opp:
                     # Keyword opportunity
@@ -617,15 +624,22 @@ class CronMonitorSystem:
                         suggested_response=f"Engage with {analysis['suggested_approach']} approach focusing on technical expertise"
                     )
                     
-                    # Generate content for this opportunity
-                    await self._generate_opportunity_content(alert_opp)
-                    
-                    # Create feedback tracking for this opportunity
-                    feedback_id = self.feedback_tracker.create_opportunity_tracking(alert_opp.to_dict())
-                    alert_opp.feedback_id = feedback_id
-                    alert_opp.feedback_urls = self.feedback_tracker.generate_feedback_urls(feedback_id)
-                    
-                    processed.append(alert_opp)
+                    # Check for duplicates before processing
+                    if not self._is_opportunity_processed(alert_opp):
+                        # Generate content for this opportunity
+                        await self._generate_opportunity_content(alert_opp)
+                        
+                        # Create feedback tracking for this opportunity
+                        feedback_id = self.feedback_tracker.create_opportunity_tracking(alert_opp.to_dict())
+                        alert_opp.feedback_id = feedback_id
+                        alert_opp.feedback_urls = self.feedback_tracker.generate_feedback_urls(feedback_id)
+                        
+                        # Mark as processed to prevent future duplicates
+                        self._mark_opportunity_processed(alert_opp)
+                        processed.append(alert_opp)
+                        logger.debug(f"New keyword opportunity: {alert_opp.content_url}")
+                    else:
+                        logger.debug(f"Skipping duplicate keyword opportunity: {alert_opp.content_url}")
                     
             except Exception as e:
                 logger.error(f"Error processing opportunity: {e}")
