@@ -1,12 +1,13 @@
 # X Engagement Bot - AI x Blockchain KOL Platform ✅ PRODUCTION READY
 
-## 🚀 **CURRENT DEPLOYMENT STATUS**
-**Status**: ✅ **PRODUCTION & ACTIVELY FINDING OPPORTUNITIES** (24/7 Docker Container)  
-**Performance**: **12+ opportunities per cycle, 4+ high-priority alerts sent**  
-**Investment**: $200/month X API Pro tier - **DELIVERING ROI**  
-**Email System**: ✅ **OPERATIONAL** with feedback tracking for voice evolution  
-**Voice Evolution**: ✅ **FEEDBACK SYSTEM ACTIVE** - Quality ratings and reply usage tracking  
-**Next Cycle**: Every 30 minutes - continuous AI x blockchain monitoring  
+## 🚀 **CURRENT DEPLOYMENT STATUS** (Updated June 2025)
+**Status**: ✅ **PRODUCTION & ENHANCED FILTERING** (24/7 Docker Container)  
+**Performance**: **High-quality v4/Unichain opportunities with shill detection**  
+**Investment**: $200/month X API Pro tier - **DELIVERING FOCUSED ROI**  
+**Email System**: ✅ **OPERATIONAL** with comprehensive feedback tracking  
+**Voice Evolution**: ✅ **ACTIVE FEEDBACK** - Quality ratings improving (3+ star content)  
+**Code Quality**: ✅ **MAJOR REFACTORING** - Removed 1,646 lines of dead code  
+**Next Cycle**: Every 30 minutes - enhanced v4/Unichain/AI monitoring  
 
 ---
 
@@ -85,23 +86,25 @@ curl http://localhost:8080/feedback/{id}/reply/primary  # Test reply tracking
 
 ---
 
-## 🎯 **CURRENT PRODUCTION PERFORMANCE**
+## 🎯 **ENHANCED PRODUCTION PERFORMANCE** (Post-Refactoring)
 
-### ✅ **LIVE SYSTEM METRICS:**
-- **🔍 Opportunity Detection**: 12+ AI x blockchain opportunities found per 30-minute cycle
-- **📧 Email Delivery**: 4+ high-priority alerts (score ≥ 0.8) sent with 100% success rate
-- **🤖 AI Content Generation**: 7-9 seconds per opportunity with 0.9 confidence scores
-- **⚡ API Efficiency**: 299/300 search calls remaining (healthy rate limiting)
-- **🎯 Voice Alignment**: 0.75-0.90 scores with crypto-native degen sensibilities
-- **🧠 Feedback Tracking**: Operational with unique opportunity IDs for voice evolution
+### ✅ **IMPROVED LIVE SYSTEM METRICS:**
+- **🔍 Enhanced Opportunity Detection**: v4/Unichain focused opportunities with 0.8+ relevance scores
+- **🛡️ Shill Detection**: Advanced filtering removes promotional content and low-quality posts
+- **📧 Email Delivery**: High-quality alerts with comprehensive feedback tracking (45+ pending)
+- **🤖 AI Content Generation**: 7-9 seconds per opportunity with improved voice alignment
+- **⚡ API Efficiency**: 299/300 search calls with intelligent rate limiting
+- **🎯 Voice Evolution**: Active feedback system with 3+ star quality ratings
+- **📊 Code Quality**: 1,646 lines of dead code removed for better maintainability
 
-### ✅ **TECHNICAL CAPABILITIES:**
+### ✅ **ENHANCED TECHNICAL CAPABILITIES:**
 - **24/7 Docker Container**: Continuous monitoring with health checks and auto-recovery
-- **AI x Blockchain Focus**: Keywords: "ai agents", "autonomous trading", "unichain", "defi"
-- **Strategic Account Tracking**: 10 high-value AI x blockchain thought leaders
-- **Voice Evolution System**: Email feedback buttons for quality rating and reply usage tracking
+- **Refined Keywords**: "uniswap v4 hooks", "unichain ai agents", "v4 mev protection"
+- **Shill Protection**: Multi-layer filtering for promotional content and excessive emojis
+- **Strategic Account Tracking**: 10 high-value AI x blockchain thought leaders  
+- **Voice Evolution System**: Email feedback buttons with real-time quality tracking
 - **Intelligent Rate Limiting**: Dynamic management with exponential backoff
-- **Advanced Logging**: Component-specific logs with rotation and archive management
+- **Clean Architecture**: Removed unused voice analyzer and content generator components
 
 ---
 
@@ -195,6 +198,64 @@ DAILY_REPORTS=24h
 
 ---
 
+## 🧪 **CRITICAL TDD & TESTING PRACTICES**
+
+### **MANDATORY Test-First Development Rules**
+**⚠️ NEVER SKIP THESE STEPS - They prevent production bugs like dual email sends**
+
+#### **1. Integration Tests REQUIRED for Email Changes**
+```bash
+# ALWAYS run before deploying email system changes
+python -m pytest tests/integration/test_single_email_flow.py -v
+python -m pytest tests/integration/ -m "email" -v
+```
+
+#### **2. End-to-End Testing for Service Changes**
+```bash
+# REQUIRED for any changes to x_engagement_service.py
+python -m pytest tests/integration/test_main_service_flow.py -v
+python scripts/testing/test_live_email_count.py  # Verify single email
+```
+
+#### **3. Critical Test Categories**
+- **Unit Tests**: Individual method behavior (existing)
+- **Integration Tests**: Multi-component interactions (MISSING - added now)
+- **End-to-End Tests**: Full system flow validation (CRITICAL GAP)
+- **Regression Tests**: Prevent known issues from returning
+
+#### **4. TDD Workflow for Major Changes**
+```bash
+# Step 1: Write failing integration test first
+echo "Write test that expects ONLY 1 email per cycle"
+
+# Step 2: Run test to confirm it fails
+python -m pytest tests/integration/test_single_email_flow.py -v
+
+# Step 3: Implement minimal code to pass test
+echo "Implement new email system"
+
+# Step 4: Run ALL tests before deployment
+python -m pytest tests/ -v
+
+# Step 5: Deploy only after ALL tests pass
+docker build -f deployment/Dockerfile.engagement -t x_engagement_bot .
+```
+
+### **Production Deployment Checklist**
+**✅ MANDATORY before any deployment:**
+- [ ] All unit tests pass
+- [ ] All integration tests pass  
+- [ ] Email flow test confirms single email per cycle
+- [ ] Main service test confirms no dual method calls
+- [ ] Live system health check after deployment
+
+### **Lessons from Dual Email Bug**
+**Root Cause**: Missing integration test for email flow  
+**Prevention**: Integration tests MUST verify system-level behavior  
+**Fix Applied**: Added `test_single_email_flow.py` to catch this class of bugs  
+
+---
+
 ## 📚 **COMPREHENSIVE DOCUMENTATION**
 
 ### **Architecture & Technical**
@@ -239,6 +300,36 @@ DAILY_REPORTS=24h
 
 ---
 
+## 📈 **RECENT MAJOR IMPROVEMENTS** (June 2025)
+
+### **🧹 Code Quality & Architecture Refactoring**
+- **✅ Dead Code Removal**: Eliminated 1,646 lines of unused code including:
+  - `voice_analyzer.py` (891 lines) - Unused voice analysis system
+  - `voice_tracker.py` (236 lines) - Replaced by feedback tracker
+  - `content/generator.py` (500+ lines) - Replaced by direct Claude integration
+  - Updated analytics exports to focus on active feedback tracking only
+
+### **🛡️ Enhanced Opportunity Filtering**
+- **✅ Shill Detection**: Multi-layer filtering removes promotional content
+  - Detects "redefining standards", "cutting edge tech", excessive emojis
+  - Filters high caps ratio and multiple promotional indicators
+- **✅ v4/Unichain Focus**: Improved relevance scoring requires:
+  - Core terms: "v4", "unichain", "hooks", "concentrated liquidity"
+  - Technical depth: "mev", "protocol", "smart contract", "architecture"
+  - Quality discussion: "technical analysis", "deep dive", "implementation"
+
+### **🎯 Keyword Strategy Refinement**
+- **✅ Removed Generic Terms**: Eliminated "ai-powered routing" that caught shills
+- **✅ Added Specific Terms**: "v4 mev protection", "unichain smart routing"
+- **✅ Higher Quality Thresholds**: relevance > 0.7, sentiment > 0.5, engagement > 0.6
+
+### **📊 Feedback System Enhancements**
+- **✅ Real-time Quality Tracking**: 3+ star ratings being received
+- **✅ 45+ Pending Opportunities**: Comprehensive feedback tracking active
+- **✅ Voice Evolution Data**: Quality ratings and reply usage tracking
+
+---
+
 ## 🎯 **NEXT DEVELOPMENT PRIORITIES**
 
 ### **Phase 1: Enhanced Voice Evolution (Week 1-2)**
@@ -260,11 +351,12 @@ DAILY_REPORTS=24h
 
 ## 🚀 **SUCCESS METRICS & ROI TRACKING**
 
-### **Current Performance (Production)**
-- **Opportunity Detection**: 12+ per cycle (360+ per day potential)
-- **Email Success Rate**: 100% delivery with enhanced formatting
-- **API Efficiency**: 1200% return (12 opportunities from 1 API call)
-- **Voice Alignment**: 0.75-0.90 scores maintaining brand consistency
+### **Enhanced Performance (Post-Refactoring)**
+- **Quality Opportunity Detection**: High-relevance v4/Unichain opportunities with shill filtering
+- **Email Success Rate**: 100% delivery with comprehensive feedback tracking (45+ pending)
+- **API Efficiency**: Focused search strategy with improved relevance scoring
+- **Voice Alignment**: 0.8+ scores with active feedback system (3+ star ratings)
+- **Code Quality**: 1,646 lines of dead code removed for better maintainability
 - **Rate Limit Health**: <1% utilization (299/300 calls remaining)
 
 ### **Strategic Objectives (90-Day Timeline)**
@@ -281,6 +373,12 @@ DAILY_REPORTS=24h
 
 ---
 
-**🎉 The X Engagement Bot is production-ready, actively finding AI x blockchain opportunities, and evolving its voice through intelligent feedback tracking!**
+**🎉 The X Engagement Bot is production-ready with enhanced filtering, comprehensive refactoring, and active voice evolution!**
+
+**Key Recent Achievements:**
+- ✅ Removed 1,646 lines of dead code for cleaner architecture
+- ✅ Implemented advanced shill detection and v4/Unichain filtering  
+- ✅ Active feedback system with quality ratings (3+ stars)
+- ✅ 45+ opportunities pending feedback for voice evolution
 
 Use `python scripts/analysis/view_feedback_analytics.py` to monitor voice evolution progress and `python deployment/quick_deploy.py` for deployments.

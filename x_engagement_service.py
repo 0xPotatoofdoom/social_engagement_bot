@@ -454,30 +454,33 @@ class XEngagementService:
         try:
             logger.info("Creating test alert to verify email system...")
             
-            # Create a test opportunity without any API calls
+            # Create startup verification test alert (clearly marked as system test)
             test_alert = AlertOpportunity(
-                account_username="TestAccount",
+                account_username="SYSTEM_STARTUP", 
                 account_tier=1,
-                content_text="🚀 X Engagement Bot is now running! This is a test alert to verify the email system is working correctly.",
-                content_url="https://twitter.com/intent/tweet?text=X%20Engagement%20Bot%20Test",
+                content_text=f"[STARTUP VERIFICATION] ✅ X Engagement Bot operational - email system test. Monitoring v4/Unichain/AI opportunities active. {datetime.now().strftime('%Y-%m-%d %H:%M')}",
+                content_url="https://system.test/startup/verification",
                 timestamp=datetime.now().isoformat(),
                 overall_score=0.85,
                 ai_blockchain_relevance=0.80,
-                technical_depth=0.75,
-                opportunity_type="system_test",
-                suggested_response_type="engagement_test",
-                time_sensitivity="immediate",
-                strategic_context="System verification test",
-                suggested_response="Verify that the X Engagement Bot email alert system is functioning properly",
-                generated_reply="✅ X Engagement Bot email system is operational and ready for monitoring!",
-                reply_reasoning="Initial system verification to confirm email delivery and formatting",
-                alternative_responses=["System test successful", "Email alerts working correctly"],
-                engagement_prediction=0.90,
-                voice_alignment_score=0.88
+                technical_depth=0.80,
+                opportunity_type="system_startup_verification",
+                suggested_response_type="system_test",
+                time_sensitivity="startup_verification",
+                strategic_context="[SYSTEM TEST] Automated startup verification message",
+                suggested_response="System verification - email alerts operational",
+                generated_reply="[STARTUP TEST] This is an automated system verification message confirming the X Engagement Bot email system is operational and ready to monitor AI x blockchain opportunities.",
+                reply_reasoning="[SYSTEM MESSAGE] Automated startup verification",
+                alternative_responses=[
+                    "[TEST] System operational and monitoring active",
+                    "[TEST] Email alerts configured and functional"
+                ],
+                engagement_prediction=0.75,
+                voice_alignment_score=0.80
             )
             
-            # Send the test alert
-            await self.monitor._send_immediate_alert([test_alert])
+            # Send the test alert using new concise system
+            await self.monitor._send_priority_alerts([test_alert])
             self.metrics.record_email_sent()
             logger.info("✅ Test alert sent successfully - email system verified")
             
@@ -529,16 +532,15 @@ class XEngagementService:
             else:
                 logger.info("Skipping keyword search - rate limited")
             
-            # Send alerts for any opportunities found
+            # Send alerts using NEW CONCISE SYSTEM ONLY
             if all_opportunities:
-                high_priority = [opp for opp in all_opportunities if opp.overall_score >= 0.8]
-                if high_priority:
-                    try:
-                        await self.monitor._send_immediate_alert(high_priority)
-                        self.metrics.record_email_sent()
-                        logger.info(f"Sent immediate alert for {len(high_priority)} opportunities")
-                    except Exception as e:
-                        logger.error(f"Email alert failed: {e}")
+                try:
+                    # Use new concise email system instead of old immediate alerts
+                    await self.monitor._send_priority_alerts(all_opportunities)
+                    self.metrics.record_email_sent()
+                    logger.info(f"Sent concise alert for {len(all_opportunities)} opportunities")
+                except Exception as e:
+                    logger.error(f"Concise email alert failed: {e}")
             
             # Log cycle summary
             rate_status = self.rate_manager.get_status()

@@ -34,53 +34,53 @@ class TestEmailAlertSystem:
     
     @pytest.fixture
     def sample_opportunities(self):
-        """Create sample opportunities for testing."""
+        """Create sample opportunities focused on Uniswap v4 + Unichain + AI intersection."""
         return [
             AlertOpportunity(
-                account_username="VitalikButerin",
+                account_username="saucepoint",
                 account_tier=1,
-                content_text="AI agents on blockchain networks are revolutionizing how we think about autonomous systems",
-                content_url="https://twitter.com/VitalikButerin/status/123456789",
+                content_text="v4 hooks with AI-powered routing optimization are showing 40% better execution than traditional AMMs. The intelligent MEV protection patterns are fascinating.",
+                content_url="https://twitter.com/saucepoint/status/123456789",
                 timestamp=datetime.now().isoformat(),
-                overall_score=0.92,
-                ai_blockchain_relevance=0.95,
-                technical_depth=0.88,
-                opportunity_type="technical_innovation",
+                overall_score=0.94,
+                ai_blockchain_relevance=0.97,
+                technical_depth=0.91,
+                opportunity_type="uniswap_v4_ai_innovation",
                 suggested_response_type="technical_insight",
                 time_sensitivity="immediate",
-                strategic_context="High-value technical discussion from Ethereum founder",
-                suggested_response="Engage with technical expertise on AI x blockchain convergence",
-                generated_reply="The convergence of AI agents and blockchain infrastructure opens fascinating possibilities for truly autonomous economic systems. The implications for MEV protection and predictive routing are particularly intriguing.",
-                reply_reasoning="Demonstrates deep technical understanding while adding unique insights",
+                strategic_context="Core v4 developer discussing AI integration breakthrough",
+                suggested_response="Technical analysis of AI-powered hook architecture and MEV implications",
+                generated_reply="The AI-routing integration is a game changer. Hooks that can predict and adapt to MEV patterns in real-time will fundamentally shift how we think about DEX architecture. Are you seeing similar improvements in gas optimization?",
+                reply_reasoning="Shows deep v4 technical knowledge while adding MEV expertise angle",
                 alternative_responses=[
-                    "This aligns with emerging patterns in autonomous protocol design we're seeing across DeFi",
-                    "The technical architecture for AI-driven blockchain systems is evolving rapidly"
+                    "This validates the thesis that intelligent hooks will eat traditional AMM designs for breakfast",
+                    "The MEV protection angle here is brilliant - predictive routing is the future"
                 ],
-                engagement_prediction=0.89,
-                voice_alignment_score=0.94
+                engagement_prediction=0.91,
+                voice_alignment_score=0.96
             ),
             AlertOpportunity(
-                account_username="dabit3",
+                account_username="VitalikButerin", 
                 account_tier=1,
-                content_text="Building the next generation of decentralized applications with AI integration",
-                content_url="https://twitter.com/dabit3/status/987654321",
+                content_text="Unichain's architecture enables autonomous trading agents that can operate with cryptographic guarantees. This is what we've been building toward.",
+                content_url="https://twitter.com/VitalikButerin/status/987654321",
                 timestamp=datetime.now().isoformat(),
-                overall_score=0.78,
-                ai_blockchain_relevance=0.82,
-                technical_depth=0.75,
-                opportunity_type="development_discussion",
-                suggested_response_type="collaboration",
-                time_sensitivity="high",
-                strategic_context="Development-focused opportunity from key developer advocate",
-                suggested_response="Share technical insights on AI x DeFi integration patterns",
-                generated_reply="The developer experience for AI-integrated dApps is still evolving. What frameworks are you finding most effective for handling off-chain AI computations with on-chain verification?",
-                reply_reasoning="Technical question that demonstrates expertise while encouraging dialogue",
+                overall_score=0.89,
+                ai_blockchain_relevance=0.93,
+                technical_depth=0.87,
+                opportunity_type="unichain_ai_agents",
+                suggested_response_type="forward_thinking_analysis",
+                time_sensitivity="immediate",
+                strategic_context="Ethereum founder highlighting Unichain AI capabilities",
+                suggested_response="Deep dive into autonomous agent architecture on Unichain",
+                generated_reply="The cryptographic guarantees for autonomous agents on Unichain unlock entirely new design spaces. I'm particularly excited about the implications for cross-chain AI coordination and trustless agent interactions.",
+                reply_reasoning="Combines Unichain technical depth with forward-thinking AI analysis",
                 alternative_responses=[
-                    "Fascinating approach to AI x dApp integration. The verification challenges are particularly interesting",
-                    "This opens up interesting possibilities for hybrid AI/blockchain architectures"
+                    "This is the infrastructure foundation needed for truly autonomous DeFi protocols",
+                    "Unichain + AI agents = the rails for the next generation of crypto-native applications"
                 ],
-                engagement_prediction=0.76,
-                voice_alignment_score=0.81
+                engagement_prediction=0.88,
+                voice_alignment_score=0.92
             )
         ]
     
@@ -102,38 +102,89 @@ class TestEmailAlertSystem:
         assert alert_config.digest_threshold == 0.4
     
     @pytest.mark.unit
-    def test_opportunity_categorization(self, monitor_system, sample_opportunities):
-        """Test opportunities are categorized correctly by score."""
-        immediate, priority, digest = monitor_system._categorize_opportunities(sample_opportunities)
+    def test_detailed_email_system_active(self, monitor_system, sample_opportunities):
+        """Test detailed email system is active and concise methods are removed."""
+        # Verify the current detailed system works
+        assert hasattr(monitor_system, '_send_priority_alerts')
+        assert hasattr(monitor_system, '_generate_original_content')
+        assert hasattr(monitor_system, '_send_detailed_alert_with_original_content')
         
-        # First opportunity (0.92 score) should be immediate
-        assert len(immediate) == 1
-        assert immediate[0].overall_score == 0.92
-        assert immediate[0].account_username == "VitalikButerin"
-        
-        # Second opportunity (0.78 score) should be priority
-        assert len(priority) == 1 
-        assert priority[0].overall_score == 0.78
-        assert priority[0].account_username == "dabit3"
-        
-        # No digest opportunities in this sample
-        assert len(digest) == 0
+        # Verify concise methods are gone (dead code cleanup successful)
+        assert not hasattr(monitor_system, '_send_concise_alert')
+        assert not hasattr(monitor_system, '_generate_concise_email')
+        assert not hasattr(monitor_system, '_generate_concise_html')
+        assert not hasattr(monitor_system, '_generate_concise_subject')
     
     @pytest.mark.unit
-    def test_generate_alert_html_structure(self, monitor_system, sample_opportunities):
-        """Test HTML alert generation structure."""
-        html_content = monitor_system._generate_alert_html(
-            opportunities=sample_opportunities,
-            alert_type="IMMEDIATE",
-            summary_stats={'total_opportunities': 2, 'avg_score': 0.85}
-        )
+    @pytest.mark.asyncio
+    async def test_original_content_generation(self, monitor_system):
+        """Test original content generation for trending topics and unhinged takes."""
+        # Test trending topic generation
+        trending_content = await monitor_system._generate_original_content(content_type="trending_topic")
         
-        assert isinstance(html_content, str)
-        assert "IMMEDIATE" in html_content
-        assert "VitalikButerin" in html_content
-        assert "dabit3" in html_content
-        assert "AI agents on blockchain" in html_content
-        assert "Building the next generation" in html_content
+        assert trending_content is not None
+        assert trending_content['content_type'] == 'trending_topic'
+        assert 'content' in trending_content
+        assert len(trending_content['content']) <= 280  # Twitter character limit
+        assert any(keyword in trending_content['content'].lower() 
+                  for keyword in ['uniswap', 'unichain', 'ai', 'blockchain', 'defi'])
+        
+        # Test unhinged take generation
+        unhinged_content = await monitor_system._generate_original_content(content_type="unhinged_take")
+        
+        assert unhinged_content is not None
+        assert unhinged_content['content_type'] == 'unhinged_take'
+        assert 'content' in unhinged_content
+        assert len(unhinged_content['content']) <= 280
+        assert unhinged_content['engagement_bait'] is True
+    
+    @pytest.mark.unit
+    def test_focused_keyword_filtering(self, monitor_system):
+        """Test filtering focuses on Uniswap v4/Unichain/AI intersection."""
+        keywords = monitor_system._get_focused_keywords()
+        
+        # Should contain specific v4/Unichain/AI intersection terms
+        expected_keywords = [
+            "uniswap v4 ai",
+            "unichain autonomous trading", 
+            "v4 hooks ai",
+            "unichain ai agents",
+            "intelligent hooks",
+            "ai-powered routing"
+        ]
+        
+        for keyword in expected_keywords:
+            assert keyword in keywords
+        
+        # Should be a concise list (not overwhelming)
+        assert len(keywords) <= 10
+    
+    @pytest.mark.unit
+    def test_detailed_html_system_active(self, monitor_system):
+        """Test detailed HTML generation system is active."""
+        # Verify the current detailed HTML system works
+        assert hasattr(monitor_system, '_generate_detailed_alert_with_original_html')
+        
+        # Verify old concise HTML method is gone
+        assert not hasattr(monitor_system, '_generate_concise_html')
+    
+    @pytest.mark.unit
+    @pytest.mark.asyncio
+    async def test_unhinged_content_generation(self, monitor_system):
+        """Test system generates unhinged content properly."""
+        # Test unhinged take generation (now part of detailed system)
+        unhinged_content = await monitor_system._generate_original_content('unhinged_take')
+        
+        # Should have proper structure
+        assert 'content_type' in unhinged_content
+        assert 'content' in unhinged_content
+        assert unhinged_content['content_type'] == 'unhinged_take'
+        
+        # Content should be present
+        content = unhinged_content['content']
+        assert content is not None
+        assert content != ""
+        assert isinstance(content, str)
     
     @pytest.mark.unit
     def test_generate_twitter_intent_urls(self, monitor_system, sample_opportunities):
@@ -182,35 +233,22 @@ class TestEmailAlertSystem:
             assert alt_response in html_content
     
     @pytest.mark.unit
-    def test_email_subject_generation(self, monitor_system, sample_opportunities):
-        """Test email subject line generation."""
-        immediate_opportunities = [opp for opp in sample_opportunities if opp.overall_score >= 0.8]
+    def test_email_subject_system_active(self, monitor_system):
+        """Test email subject system is properly integrated."""
+        # Verify the current detailed system handles subjects
+        assert hasattr(monitor_system, '_send_detailed_alert_with_original_content')
         
-        subject = monitor_system._generate_email_subject("immediate", len(immediate_opportunities))
-        
-        assert "🔥 IMMEDIATE" in subject
-        assert str(len(immediate_opportunities)) in subject
-        assert "High-Priority" in subject
-        assert "AI x Blockchain" in subject
+        # Verify old concise subject method is gone
+        assert not hasattr(monitor_system, '_generate_concise_subject')
     
     @pytest.mark.unit
-    @pytest.mark.asyncio
-    async def test_send_immediate_alert_flow(self, monitor_system, sample_opportunities):
-        """Test immediate alert sending flow."""
-        high_priority_opportunities = [opp for opp in sample_opportunities if opp.overall_score >= 0.8]
+    def test_immediate_alert_method_removed(self, monitor_system):
+        """Test immediate alert method was removed as dead code."""
+        # Verify immediate alert method is gone (dead code cleanup)
+        assert not hasattr(monitor_system, '_send_immediate_alert')
         
-        # Mock SMTP components
-        with patch('smtplib.SMTP') as mock_smtp:
-            mock_server = MagicMock()
-            mock_smtp.return_value.__enter__.return_value = mock_server
-            
-            await monitor_system._send_immediate_alert(high_priority_opportunities)
-            
-            # Verify SMTP connection was attempted
-            mock_smtp.assert_called_once_with(monitor_system.config.smtp_server, monitor_system.config.smtp_port)
-            mock_server.starttls.assert_called_once()
-            mock_server.login.assert_called_once()
-            mock_server.send_message.assert_called_once()
+        # Verify current priority alert system is active
+        assert hasattr(monitor_system, '_send_priority_alerts')
     
     @pytest.mark.unit
     def test_opportunity_with_enhanced_content(self):

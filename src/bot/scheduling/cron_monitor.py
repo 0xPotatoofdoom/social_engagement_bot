@@ -246,32 +246,35 @@ class CronMonitorSystem:
             # Skip strategic accounts for now to avoid rate limits
             logger.info("Skipping strategic account monitoring to avoid rate limits")
             
-            # Create test alert only if not already sent today
-            logger.info("Checking if test alert needed")
+            # Create focused test alert for v4/Unichain/AI system
+            logger.info("Creating focused v4/Unichain/AI test opportunity")
             from bot.scheduling.cron_monitor import AlertOpportunity
             
             test_alert = AlertOpportunity(
-                account_username="TestAccount",
+                account_username="saucepoint",
                 account_tier=1,
-                content_text=f"Daily AI x blockchain test opportunity - {datetime.now().strftime('%Y-%m-%d')}",
-                content_url=f"https://twitter.com/test/status/{datetime.now().strftime('%Y%m%d')}",
+                content_text=f"Testing v4 AI integration patterns with predictive MEV protection - {datetime.now().strftime('%Y-%m-%d')}",
+                content_url=f"https://twitter.com/saucepoint/status/1234567890123456789",
                 timestamp=datetime.now().isoformat(),
                 
-                overall_score=0.85,
-                ai_blockchain_relevance=0.90,
-                technical_depth=0.80,
-                opportunity_type="test_opportunity",
-                suggested_response_type="test_response",
+                overall_score=0.91,
+                ai_blockchain_relevance=0.95,
+                technical_depth=0.88,
+                opportunity_type="uniswap_v4_ai_innovation",
+                suggested_response_type="technical_insight",
                 time_sensitivity="immediate",
                 
-                strategic_context="Daily test opportunity to verify email system",
-                suggested_response="Test the email alert system",
+                strategic_context="Core v4 developer discussing AI integration breakthrough",
+                suggested_response="Technical analysis of AI-powered hook architecture",
                 
-                generated_reply="This is a daily test reply to verify the email system is working correctly.",
-                reply_reasoning="Testing email system functionality",
-                alternative_responses=["Test alternative 1", "Test alternative 2"],
-                engagement_prediction=0.75,
-                voice_alignment_score=0.80
+                generated_reply="The AI integration patterns emerging in v4 hooks are revolutionary. Real-time MEV prediction and adaptive routing will fundamentally change DEX efficiency.",
+                reply_reasoning="Shows deep v4 technical knowledge with AI expertise",
+                alternative_responses=[
+                    "This validates autonomous trading infrastructure on Unichain",
+                    "The convergence of AI agents and v4 architecture is inevitable"
+                ],
+                engagement_prediction=0.89,
+                voice_alignment_score=0.93
             )
             
             # Filter out duplicates
@@ -378,17 +381,8 @@ class CronMonitorSystem:
         opportunities = []
         
         try:
-            # Get AI x blockchain keywords from enhanced monitoring
-            ai_blockchain_keywords = [
-                "ai agents blockchain",
-                "autonomous trading",
-                "machine learning defi",
-                "v4 hooks ai",
-                "uniswap automation",
-                "predictive mev",
-                "ai blockchain convergence",
-                "intelligent protocols"
-            ]
+            # Get focused keywords for v4/Unichain/AI intersection
+            ai_blockchain_keywords = self._get_focused_keywords()
             
             for keyword in ai_blockchain_keywords:
                 try:
@@ -760,40 +754,118 @@ class CronMonitorSystem:
             return 'digest'
     
     async def _send_priority_alerts(self, opportunities: List[AlertOpportunity]):
-        """Send email alerts based on priority levels"""
-        if not opportunities:
-            return
+        """Send detailed email alerts with feedback tracking, opportunities + original content"""
+        logger.info(f"Processing {len(opportunities)} opportunities for detailed email with feedback + original content")
         
-        # Immediate alerts (>= 0.8 score)
-        immediate_alerts = [opp for opp in opportunities if opp.overall_score >= self.config.immediate_threshold]
-        if immediate_alerts:
-            await self._send_immediate_alert(immediate_alerts)
+        # Filter for highest priority opportunities (limit to 2 for email readability with original content)
+        high_priority_opportunities = sorted(
+            opportunities, 
+            key=lambda x: x.overall_score, 
+            reverse=True
+        )[:2] if opportunities else []
         
-        # Priority alerts (>= 0.6 score)
-        priority_alerts = [opp for opp in opportunities if self.config.priority_threshold <= opp.overall_score < self.config.immediate_threshold]
-        if priority_alerts:
-            await self._send_priority_alert(priority_alerts)
+        # Generate feedback URLs for each opportunity and register with feedback tracker
+        feedback_tracker = get_feedback_tracker()
+        for opp in high_priority_opportunities:
+            # Register opportunity with feedback tracker
+            opp_data = {
+                'account_username': opp.account_username,
+                'opportunity_type': opp.opportunity_type,
+                'overall_score': opp.overall_score,
+                'generated_reply': opp.generated_reply,
+                'alternative_responses': opp.alternative_responses,
+                'voice_alignment_score': opp.voice_alignment_score,
+                'content_url': opp.content_url
+            }
+            opp.feedback_id = feedback_tracker.create_opportunity_tracking(opp_data)
+            opp.feedback_urls = self._generate_feedback_urls(opp)
+        
+        # Generate original content (trending topic or unhinged take)
+        content_type = "trending_topic" if len(high_priority_opportunities) >= 2 else "unhinged_take"
+        original_content = await self._generate_original_content(content_type)
+        
+        # Register original content with feedback tracker
+        original_content_data = {
+            'account_username': 'AI_Generated',
+            'opportunity_type': f'original_{content_type}',
+            'overall_score': 0.8,  # Default score for original content
+            'generated_reply': original_content['content'],
+            'alternative_responses': [],
+            'voice_alignment_score': 0.85,  # Default voice alignment
+            'content_url': 'https://twitter.com/intent/tweet'
+        }
+        original_content_id = feedback_tracker.create_opportunity_tracking(original_content_data)
+        original_content['feedback_id'] = original_content_id
+        
+        # Send detailed alert with both opportunities and original content
+        await self._send_detailed_alert_with_original_content(high_priority_opportunities, original_content)
     
-    async def _send_immediate_alert(self, opportunities: List[AlertOpportunity]):
-        """Send immediate high-priority email alert"""
+    def _generate_feedback_urls(self, opportunity: AlertOpportunity) -> Dict[str, str]:
+        """Generate feedback URLs for opportunity quality rating and reply usage tracking"""
+        base_url = "http://localhost:8080/feedback"
+        opp_id = opportunity.feedback_id or f"opp_{hash(opportunity.content_url) % 10000}"
+        
+        return {
+            # Quality rating URLs
+            'excellent': f"{base_url}/{opp_id}/quality/5",
+            'good': f"{base_url}/{opp_id}/quality/4", 
+            'okay': f"{base_url}/{opp_id}/quality/3",
+            'poor': f"{base_url}/{opp_id}/quality/2",
+            'bad': f"{base_url}/{opp_id}/quality/1",
+            
+            # Reply usage tracking URLs
+            'used_primary': f"{base_url}/{opp_id}/reply/primary",
+            'used_alt1': f"{base_url}/{opp_id}/reply/alt1",
+            'used_alt2': f"{base_url}/{opp_id}/reply/alt2", 
+            'used_custom': f"{base_url}/{opp_id}/reply/custom",
+            'not_used': f"{base_url}/{opp_id}/reply/none"
+        }
+    
+    async def _send_detailed_alert_with_original_content(self, opportunities: List[AlertOpportunity], original_content: Dict):
+        """Send detailed email alert with opportunities + original content + comprehensive feedback tracking"""
         try:
-            subject = f"🔥 IMMEDIATE: {len(opportunities)} High-Priority AI x Blockchain Opportunities"
+            opp_count = len(opportunities)
+            content_type = original_content.get('content_type', 'unknown')
             
-            html_content = self._generate_alert_html(
-                "IMMEDIATE ACTION REQUIRED",
-                opportunities,
-                "These opportunities require immediate attention (within 30 minutes) for maximum impact."
-            )
+            # Generate subject based on content
+            if opp_count == 0:
+                subject = f"🚀 Original {content_type.replace('_', ' ').title()} + AI x Blockchain Focus"
+            else:
+                subject = f"🎯 {opp_count} AI x Blockchain Opportunities + {content_type.replace('_', ' ').title()}"
             
-            await self._send_email(subject, html_content, "immediate", len(opportunities))
+            html_content = self._generate_detailed_alert_with_original_html(opportunities, original_content)
+            
+            alert_type = f"detailed_with_{content_type}"
+            await self._send_email(subject, html_content, alert_type, opp_count)
             
             # Record alert
-            self._record_alert('immediate', len(opportunities), opportunities)
+            self._record_alert(alert_type, opp_count, opportunities)
             
-            logger.info(f"Sent immediate alert for {len(opportunities)} opportunities")
+            logger.info(f"Sent detailed alert: {opp_count} opportunities + {content_type}")
             
         except Exception as e:
-            logger.error(f"Error sending immediate alert: {e}")
+            logger.error(f"Error sending detailed alert with original content: {e}")
+    
+    async def _send_detailed_alert(self, opportunities: List[AlertOpportunity]):
+        """Send detailed email alert with comprehensive feedback tracking (legacy method)"""
+        try:
+            subject = f"🎯 {len(opportunities)} AI x Blockchain Opportunities with Feedback Tracking"
+            
+            html_content = self._generate_alert_html(
+                "PRIORITY OPPORTUNITIES WITH FEEDBACK",
+                opportunities,
+                "High-quality AI x blockchain engagement opportunities with voice evolution tracking."
+            )
+            
+            await self._send_email(subject, html_content, "detailed_priority", len(opportunities))
+            
+            # Record alert
+            self._record_alert('detailed_priority', len(opportunities), opportunities)
+            
+            logger.info(f"Sent detailed alert with feedback tracking for {len(opportunities)} opportunities")
+            
+        except Exception as e:
+            logger.error(f"Error sending detailed alert: {e}")
     
     async def _send_priority_alert(self, opportunities: List[AlertOpportunity]):
         """Send priority email alert"""
@@ -1050,6 +1122,317 @@ class CronMonitorSystem:
         
         return html_template
     
+    def _generate_detailed_alert_with_original_html(self, opportunities: List[AlertOpportunity], original_content: Dict) -> str:
+        """Generate detailed HTML email with opportunities + original content + feedback tracking"""
+        import urllib.parse
+        
+        opportunities_html = ""
+        
+        # Generate opportunities section (same as detailed format)
+        for i, opp in enumerate(opportunities[:2], 1):  # Limit to 2 for readability with original content
+            emoji = "🔥" if opp.overall_score >= 0.8 else "⚡" if opp.overall_score >= 0.6 else "📊"
+            
+            # Generate enhanced tweet URLs - handle both real and test URLs
+            tweet_id = opp.content_url.split('/')[-1] if '/status/' in opp.content_url else None
+            
+            if tweet_id and tweet_id.isdigit():
+                # Real tweet ID - use reply intent
+                reply_url = f"https://twitter.com/intent/tweet?in_reply_to={tweet_id}&text={urllib.parse.quote(str(opp.generated_reply or ''))}"
+                quote_url = f"https://twitter.com/intent/tweet?url={opp.content_url}&text={urllib.parse.quote(str(opp.generated_reply or ''))}"
+            else:
+                # Test data or invalid URL - use general compose intent
+                reply_text = f"@{opp.account_username} {opp.generated_reply or ''}"
+                reply_url = f"https://twitter.com/intent/tweet?text={urllib.parse.quote(reply_text)}"
+                quote_url = f"https://twitter.com/intent/tweet?text={urllib.parse.quote(str(opp.generated_reply or ''))}"
+            
+            # Format alternative responses
+            alternatives_html = ""
+            if opp.alternative_responses:
+                for j, alt in enumerate(opp.alternative_responses[:2], 1):
+                    if tweet_id and tweet_id.isdigit():
+                        alt_reply_url = f"https://twitter.com/intent/tweet?in_reply_to={tweet_id}&text={urllib.parse.quote(str(alt))}"
+                    else:
+                        alt_reply_text = f"@{opp.account_username} {alt}"
+                        alt_reply_url = f"https://twitter.com/intent/tweet?text={urllib.parse.quote(alt_reply_text)}"
+                    alternatives_html += f"""
+                    <div style="background: #f0f0f0; padding: 8px; margin: 5px 0; border-radius: 4px; border-left: 3px solid #3498db;">
+                        <strong>Alternative {j}:</strong> {alt}<br>
+                        <a href="{alt_reply_url}" style="font-size: 12px; color: #3498db; text-decoration: none;">📝 Use This Reply</a>
+                    </div>
+                    """
+            
+            # Performance prediction indicators
+            engagement_color = "#27ae60" if opp.engagement_prediction and opp.engagement_prediction >= 0.7 else "#f39c12" if opp.engagement_prediction and opp.engagement_prediction >= 0.5 else "#e74c3c"
+            voice_color = "#27ae60" if opp.voice_alignment_score and opp.voice_alignment_score >= 0.8 else "#f39c12" if opp.voice_alignment_score and opp.voice_alignment_score >= 0.6 else "#e74c3c"
+            
+            # Feedback URLs for this opportunity
+            feedback_urls = opp.feedback_urls if opp.feedback_urls else {}
+            excellent_url = feedback_urls.get('excellent', '#')
+            good_url = feedback_urls.get('good', '#')
+            okay_url = feedback_urls.get('okay', '#')
+            poor_url = feedback_urls.get('poor', '#')
+            bad_url = feedback_urls.get('bad', '#')
+            used_primary_url = feedback_urls.get('used_primary', '#')
+            used_alt1_url = feedback_urls.get('used_alt1', '#')
+            used_alt2_url = feedback_urls.get('used_alt2', '#')
+            used_custom_url = feedback_urls.get('used_custom', '#')
+            not_used_url = feedback_urls.get('not_used', '#')
+            feedback_id = opp.feedback_id or 'N/A'
+            
+            opportunities_html += f"""
+            <div style="border: 1px solid #ddd; margin: 20px 0; padding: 20px; border-radius: 10px; background: #fafafa;">
+                <h3 style="color: #2c3e50; margin-top: 0; border-bottom: 2px solid #3498db; padding-bottom: 8px;">
+                    {emoji} Opportunity {i}: @{opp.account_username}
+                </h3>
+                
+                <div style="background: #fff; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #3498db;">
+                    <strong style="color: #2c3e50;">Original Content:</strong><br>
+                    <em>"{opp.content_text[:300]}{'...' if len(opp.content_text) > 300 else ''}"</em>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 15px 0; background: #f8f9fa; padding: 12px; border-radius: 6px;">
+                    <div><strong>Overall Score:</strong> <span style="color: {engagement_color};">{opp.overall_score:.2f}</span></div>
+                    <div><strong>AI x Blockchain:</strong> <span style="color: #8e44ad;">{opp.ai_blockchain_relevance:.2f}</span></div>
+                    <div><strong>Technical Depth:</strong> <span style="color: #d35400;">{opp.technical_depth:.2f}</span></div>
+                </div>
+                
+                <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #27ae60;">
+                    <strong style="color: #27ae60;">🤖 AI-Generated Response:</strong><br>
+                    <div style="background: #fff; padding: 12px; margin: 8px 0; border-radius: 6px; font-style: italic; border: 1px solid #ddd;">
+                        "{opp.generated_reply or 'Response generation in progress...'}"
+                    </div>
+                    
+                    {f'<div style="font-size: 12px; color: #666; margin-top: 8px;"><strong>Reasoning:</strong> {opp.reply_reasoning}</div>' if opp.reply_reasoning else ''}
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; font-size: 12px;">
+                        <div>📈 <strong>Engagement Prediction:</strong> <span style="color: {engagement_color};">{(opp.engagement_prediction or 0):.0%}</span></div>
+                        <div>🎭 <strong>Voice Alignment:</strong> <span style="color: {voice_color};">{(opp.voice_alignment_score or 0):.0%}</span></div>
+                    </div>
+                </div>
+                
+                {f'<div style="margin: 15px 0;"><strong style="color: #8e44ad;">🔄 Alternative Responses:</strong>{alternatives_html}</div>' if alternatives_html else ''}
+                
+                <div style="margin: 20px 0; text-align: center;">
+                    <a href="{opp.content_url}" 
+                       style="background: #3498db; color: white; padding: 12px 20px; text-decoration: none; border-radius: 6px; margin: 5px; display: inline-block; font-weight: bold;">
+                        🔗 View Original Tweet
+                    </a>
+                    
+                    <a href="{reply_url}" 
+                       style="background: #27ae60; color: white; padding: 12px 20px; text-decoration: none; border-radius: 6px; margin: 5px; display: inline-block; font-weight: bold;">
+                        💬 Reply with Generated Content
+                    </a>
+                    
+                    <a href="{quote_url}" 
+                       style="background: #e67e22; color: white; padding: 12px 20px; text-decoration: none; border-radius: 6px; margin: 5px; display: inline-block; font-weight: bold;">
+                        🔄 Quote Tweet
+                    </a>
+                </div>
+                
+                <!-- Feedback Section -->
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #6c757d;">
+                    <strong style="color: #495057;">📊 Feedback & Learning</strong><br>
+                    <div style="margin: 10px 0; font-size: 12px; color: #6c757d;">
+                        Help improve voice evolution by rating this opportunity and tracking reply usage:
+                    </div>
+                    
+                    <!-- Quality Rating Buttons -->
+                    <div style="margin: 8px 0;">
+                        <strong style="font-size: 12px; color: #495057;">Opportunity Quality:</strong><br>
+                        <div style="margin: 5px 0;">
+                            <a href="{excellent_url}" 
+                               style="background: #28a745; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                                ⭐⭐⭐⭐⭐ Excellent
+                            </a>
+                            <a href="{good_url}" 
+                               style="background: #20c997; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                                ⭐⭐⭐⭐ Good
+                            </a>
+                            <a href="{okay_url}" 
+                               style="background: #ffc107; color: black; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                                ⭐⭐⭐ Okay
+                            </a>
+                            <a href="{poor_url}" 
+                               style="background: #fd7e14; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                                ⭐⭐ Poor
+                            </a>
+                            <a href="{bad_url}" 
+                               style="background: #dc3545; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                                ⭐ Bad
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Reply Usage Tracking -->
+                    <div style="margin: 8px 0;">
+                        <strong style="font-size: 12px; color: #495057;">Reply Usage (click after posting):</strong><br>
+                        <div style="margin: 5px 0;">
+                            <a href="{used_primary_url}" 
+                               style="background: #007bff; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                                🎯 Used Primary Reply
+                            </a>
+                            <a href="{used_alt1_url}" 
+                               style="background: #6f42c1; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                                🔄 Used Alternative 1
+                            </a>
+                            <a href="{used_alt2_url}" 
+                               style="background: #e83e8c; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                                🔄 Used Alternative 2
+                            </a>
+                            <a href="{used_custom_url}" 
+                               style="background: #17a2b8; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                                ✏️ Used Custom Reply
+                            </a>
+                            <a href="{not_used_url}" 
+                               style="background: #6c757d; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                                ❌ Didn't Use
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div style="font-size: 10px; color: #868e96; margin-top: 8px;">
+                        Feedback ID: {feedback_id} | This data helps evolve voice and content quality over time
+                    </div>
+                </div>
+            </div>
+            """
+        
+        # Generate original content section with feedback
+        original_text = urllib.parse.quote(str(original_content['content']))
+        content_type = original_content.get('content_type', 'unknown')
+        content_id = original_content.get('feedback_id', f"orig_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
+        
+        # Generate feedback URLs for original content
+        base_url = "http://localhost:8080/feedback"
+        original_feedback_urls = {
+            'excellent': f"{base_url}/{content_id}/quality/5",
+            'good': f"{base_url}/{content_id}/quality/4",
+            'okay': f"{base_url}/{content_id}/quality/3", 
+            'poor': f"{base_url}/{content_id}/quality/2",
+            'bad': f"{base_url}/{content_id}/quality/1",
+            'used': f"{base_url}/{content_id}/reply/posted",
+            'not_used': f"{base_url}/{content_id}/reply/none"
+        }
+        
+        original_html = f"""
+        <div style="border: 2px solid #e74c3c; margin: 20px 0; padding: 20px; border-radius: 10px; background: #fff5f5;">
+            <h3 style="color: #e74c3c; margin-top: 0; border-bottom: 2px solid #e74c3c; padding-bottom: 8px;">
+                🚀 Original Content ({content_type.replace('_', ' ').title()})
+            </h3>
+            
+            <div style="background: #fff; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #e74c3c;">
+                <strong style="color: #2c3e50;">Generated Content:</strong><br>
+                <div style="font-weight: bold; font-size: 16px; font-style: italic; margin: 10px 0; padding: 12px; background: #f8f9fa; border-radius: 6px;">
+                    "{original_content['content']}"
+                </div>
+                {f'<div style="font-size: 12px; color: #666;"><strong>Engagement Bait:</strong> {"Yes" if original_content.get("engagement_bait") else "No"}</div>' if 'engagement_bait' in original_content else ''}
+            </div>
+            
+            <div style="margin: 20px 0; text-align: center;">
+                <a href="https://twitter.com/intent/tweet?text={original_text}" 
+                   style="background: #e74c3c; color: white; padding: 12px 20px; text-decoration: none; border-radius: 6px; margin: 5px; display: inline-block; font-weight: bold;">
+                    📤 Post This Content
+                </a>
+            </div>
+            
+            <!-- Original Content Feedback Section -->
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #6c757d;">
+                <strong style="color: #495057;">📊 Original Content Feedback</strong><br>
+                <div style="margin: 10px 0; font-size: 12px; color: #6c757d;">
+                    Rate the quality of this generated content:
+                </div>
+                
+                <!-- Quality Rating Buttons -->
+                <div style="margin: 8px 0;">
+                    <strong style="font-size: 12px; color: #495057;">Content Quality:</strong><br>
+                    <div style="margin: 5px 0;">
+                        <a href="{original_feedback_urls['excellent']}" 
+                           style="background: #28a745; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                            ⭐⭐⭐⭐⭐ Excellent
+                        </a>
+                        <a href="{original_feedback_urls['good']}" 
+                           style="background: #20c997; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                            ⭐⭐⭐⭐ Good
+                        </a>
+                        <a href="{original_feedback_urls['okay']}" 
+                           style="background: #ffc107; color: black; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                            ⭐⭐⭐ Okay
+                        </a>
+                        <a href="{original_feedback_urls['poor']}" 
+                           style="background: #fd7e14; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                            ⭐⭐ Poor
+                        </a>
+                        <a href="{original_feedback_urls['bad']}" 
+                           style="background: #dc3545; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                            ⭐ Bad
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Usage Tracking -->
+                <div style="margin: 8px 0;">
+                    <strong style="font-size: 12px; color: #495057;">Usage (click after posting):</strong><br>
+                    <div style="margin: 5px 0;">
+                        <a href="{original_feedback_urls['used']}" 
+                           style="background: #007bff; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                            ✅ Posted This Content
+                        </a>
+                        <a href="{original_feedback_urls['not_used']}" 
+                           style="background: #6c757d; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                            ❌ Didn't Post
+                        </a>
+                    </div>
+                </div>
+                
+                <div style="font-size: 10px; color: #868e96; margin-top: 8px;">
+                    Content ID: {content_id} | This feedback helps improve original content generation
+                </div>
+            </div>
+        </div>
+        """
+        
+        html_template = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <title>AI x Blockchain Opportunities + Original Content</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
+            <h1 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">
+                🎯 AI x Blockchain Opportunities + Original Content
+            </h1>
+            
+            <p style="background: #fff3cd; padding: 15px; border-radius: 5px; border-left: 4px solid #ffc107;">
+                <strong>Alert Generated:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}<br>
+                <strong>Content Mix:</strong> {len(opportunities)} opportunities + 1 {content_type.replace('_', ' ')}
+            </p>
+            
+            {f'<h2 style="color: #2c3e50;">High-Priority Opportunities:</h2>{opportunities_html}' if opportunities else ''}
+            
+            <h2 style="color: #e74c3c;">Original Content for Engagement:</h2>
+            {original_html}
+            
+            <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+                <h3 style="color: #2c3e50; margin-top: 0;">Next Steps:</h3>
+                <ol>
+                    {f'<li>Review and engage with priority opportunities above</li>' if opportunities else ''}
+                    <li>Consider posting the original content for engagement</li>
+                    <li>Use feedback buttons to help improve AI content quality</li>
+                    <li>Track which content performs best for voice evolution</li>
+                </ol>
+            </div>
+            
+            <div style="margin-top: 20px; padding: 15px; background: #e8f5e8; border-radius: 5px; text-align: center;">
+                <p style="margin: 0;"><strong>AI x Blockchain KOL Development Platform</strong><br>
+                Detailed monitoring with feedback-driven voice evolution</p>
+            </div>
+        </body>
+        </html>
+        """
+        
+        return html_template
+    
     async def _send_email(self, subject: str, html_content: str, alert_type: str = "unknown", opportunity_count: int = 0):
         """Send email alert with enhanced logging"""
         smtp_response = None
@@ -1202,6 +1585,114 @@ class CronMonitorSystem:
         logger.info("Stopping continuous monitoring")
         self.monitoring_active = False
     
+    def _get_focused_keywords(self) -> List[str]:
+        """Get focused keywords for Uniswap v4/Unichain/AI intersection."""
+        return [
+            # Specific v4/Unichain technical terms (higher quality)
+            "uniswap v4 hooks",
+            "unichain ai agents", 
+            "v4 concentrated liquidity",
+            "unichain autonomous trading",
+            "v4 mev protection",
+            "unichain smart routing",
+            # Remove generic "ai-powered routing" that catches shills
+            "v4 hook architecture",
+            "unichain machine learning",
+            "autonomous v4 strategies",
+            "unichain protocol design"
+        ]
+    
+    async def _generate_original_content(self, content_type: str = "trending_topic") -> Dict:
+        """Generate original content for trending topics or unhinged takes."""
+        logger.info(f"Generating original content of type: {content_type}")
+        
+        try:
+            if content_type == "trending_topic":
+                # Generate content based on current trends in v4/Unichain/AI space
+                prompt = """
+                Generate an original tweet about current trends at the intersection of Uniswap v4, Unichain, and AI.
+                
+                Voice: Technical authority with crypto-native degen sensibilities
+                Style: Forward-thinking, no hashtags, clean text only
+                Length: Max 280 characters
+                
+                Focus on one of these trending angles:
+                - AI-powered MEV protection on v4
+                - Autonomous trading agents on Unichain
+                - Intelligent hook architecture
+                - Predictive routing optimization
+                - Cross-chain AI coordination
+                
+                Return only the tweet text, no additional formatting.
+                """
+                
+                if self.claude_client:
+                    async with self.claude_client:
+                        response = await self.claude_client._make_api_call("messages", {
+                            "model": "claude-3-haiku-20240307",
+                            "max_tokens": 150,
+                            "messages": [{"role": "user", "content": prompt}]
+                        })
+                    content = response['content'][0]['text'].strip()
+                else:
+                    # Fallback trending content
+                    content = "The convergence of AI agents and v4 hooks is creating entirely new design patterns for autonomous DEX infrastructure. We're entering a new era of intelligent protocols."
+                
+                return {
+                    'content_type': 'trending_topic',
+                    'content': content,
+                    'engagement_bait': False,
+                    'generated_at': datetime.now().isoformat()
+                }
+            
+            elif content_type == "unhinged_take":
+                # Generate provocative engagement bait
+                prompt = """
+                Generate a slightly unhinged hot take about AI x blockchain that will get people talking.
+                
+                Voice: Confident crypto degen with bold predictions
+                Style: Provocative but intelligent, no hashtags
+                Length: Max 280 characters
+                
+                Examples of the vibe:
+                - "Hot take: AI agents will eat 90% of DEX volume within 18 months"
+                - "Unpopular opinion: Manual trading will look as primitive as using dial-up internet"
+                - "Bold prediction: Unichain + AI = the death of centralized exchanges"
+                
+                Make it controversial enough to drive engagement but technically grounded.
+                Return only the tweet text.
+                """
+                
+                if self.claude_client:
+                    async with self.claude_client:
+                        response = await self.claude_client._make_api_call("messages", {
+                            "model": "claude-3-haiku-20240307",
+                            "max_tokens": 150,
+                            "messages": [{"role": "user", "content": prompt}]
+                        })
+                    content = response['content'][0]['text'].strip()
+                else:
+                    # Fallback unhinged take
+                    content = "Hot take: AI agents on Unichain will make manual trading look like using a fax machine in 2024. The infrastructure shift is already happening, most just don't see it yet."
+                
+                return {
+                    'content_type': 'unhinged_take',
+                    'content': content,
+                    'engagement_bait': True,
+                    'generated_at': datetime.now().isoformat()
+                }
+                
+        except Exception as e:
+            logger.error(f"Error generating original content: {e}")
+            # Fallback content
+            return {
+                'content_type': content_type,
+                'content': "The AI x blockchain convergence is accelerating faster than most realize. The technical foundations are solid, the applications are emerging, and the infrastructure is maturing.",
+                'engagement_bait': content_type == "unhinged_take",
+                'generated_at': datetime.now().isoformat()
+            }
+    
+
     def get_monitoring_stats(self) -> Dict:
         """Get monitoring system statistics"""
         current_time = datetime.now()

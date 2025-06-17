@@ -166,5 +166,525 @@
     "type": "immediate",
     "opportunity_count": 3,
     "work_hours": true
+  },
+  {
+    "timestamp": "2025-06-17T16:45:17.591356",
+    "type": "immediate",
+    "opportunity_count": 1,
+    "work_hours": true,
+    "opportunity_ids": [
+      "test_opportunity_2025-06-17"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "TestAccount",
+        "score": 0.85,
+        "type": "system_test"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T16:46:23.778238",
+    "type": "immediate",
+    "opportunity_count": 2,
+    "work_hours": true,
+    "opportunity_ids": [
+      "keyword_search_ai-powered_routing_1935009386394505295",
+      "keyword_search_ai-powered_routing_1935017763522883885"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "keyword_search_ai-powered_routing",
+        "score": 0.8550000000000001,
+        "type": "breakthrough_announcement"
+      },
+      {
+        "account": "keyword_search_ai-powered_routing",
+        "score": 0.805,
+        "type": "technical_discussion|breakthrough_announcement|collaboration"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T16:48:11.751996",
+    "type": "mixed_content",
+    "opportunity_count": 1,
+    "work_hours": true,
+    "opportunity_ids": [
+      "0e18aca8_20250617_16"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "saucepoint",
+        "score": 0.91,
+        "type": "uniswap_v4_ai_innovation"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T16:49:20.578603",
+    "type": "immediate",
+    "opportunity_count": 2,
+    "work_hours": true,
+    "opportunity_ids": [
+      "keyword_search_ai-powered_routing_1935017763522883885",
+      "keyword_search_ai-powered_routing_1935009386394505295"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "keyword_search_ai-powered_routing",
+        "score": 0.8550000000000001,
+        "type": "technical_discussion|breakthrough_announcement|collaboration"
+      },
+      {
+        "account": "keyword_search_ai-powered_routing",
+        "score": 0.8550000000000001,
+        "type": "breakthrough_announcement"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T16:53:58.899895",
+    "type": "mixed_content",
+    "opportunity_count": 1,
+    "work_hours": true,
+    "opportunity_ids": [
+      "saucepoint_1234567890123456789"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "saucepoint",
+        "score": 0.91,
+        "type": "uniswap_v4_ai_innovation"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T16:54:49.294488",
+    "type": "immediate",
+    "opportunity_count": 1,
+    "work_hours": true,
+    "opportunity_ids": [
+      "keyword_search_ai-powered_routing_1935009386394505295"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "keyword_search_ai-powered_routing",
+        "score": 0.8550000000000001,
+        "type": "breakthrough_announcement"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T16:56:12.197606",
+    "type": "mixed_content",
+    "opportunity_count": 1,
+    "work_hours": true,
+    "opportunity_ids": [
+      "saucepoint_1234567890123456789"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "saucepoint",
+        "score": 0.91,
+        "type": "uniswap_v4_ai_innovation"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T16:57:01.927411",
+    "type": "immediate",
+    "opportunity_count": 2,
+    "work_hours": true,
+    "opportunity_ids": [
+      "keyword_search_ai-powered_routing_1935017763522883885",
+      "keyword_search_ai-powered_routing_1935009386394505295"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "keyword_search_ai-powered_routing",
+        "score": 0.8550000000000001,
+        "type": "breakthrough_announcement"
+      },
+      {
+        "account": "keyword_search_ai-powered_routing",
+        "score": 0.8550000000000001,
+        "type": "breakthrough_announcement"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T16:59:03.516947",
+    "type": "mixed_content",
+    "opportunity_count": 1,
+    "work_hours": true,
+    "opportunity_ids": [
+      "saucepoint_1234567890123456789"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "saucepoint",
+        "score": 0.91,
+        "type": "uniswap_v4_ai_innovation"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T16:59:49.882281",
+    "type": "concise_opportunities",
+    "opportunity_count": 2,
+    "work_hours": true,
+    "opportunity_ids": [
+      "keyword_search_ai-powered_routing_1935009386394505295",
+      "keyword_search_ai-powered_routing_1935017763522883885"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "keyword_search_ai-powered_routing",
+        "score": 0.8550000000000001,
+        "type": "technical_discussion|breakthrough_announcement|collaboration"
+      },
+      {
+        "account": "keyword_search_ai-powered_routing",
+        "score": 0.755,
+        "type": "technical_discussion|breakthrough_announcement|collaboration"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-18T04:01:51.239229",
+    "type": "mixed_content",
+    "opportunity_count": 1,
+    "work_hours": false,
+    "opportunity_ids": [
+      "saucepoint_123"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "saucepoint",
+        "score": 0.85,
+        "type": "uniswap_v4_ai_innovation"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-18T04:02:22.499137",
+    "type": "mixed_content",
+    "opportunity_count": 1,
+    "work_hours": false,
+    "opportunity_ids": [
+      "saucepoint_123"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "saucepoint",
+        "score": 0.85,
+        "type": "uniswap_v4_ai_innovation"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-18T04:02:22.502256",
+    "type": "mixed_content",
+    "opportunity_count": 1,
+    "work_hours": false,
+    "opportunity_ids": [
+      "saucepoint_123"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "saucepoint",
+        "score": 0.85,
+        "type": "uniswap_v4_ai_innovation"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-18T04:02:22.505010",
+    "type": "mixed_content",
+    "opportunity_count": 1,
+    "work_hours": false,
+    "opportunity_ids": [
+      "saucepoint_123"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "saucepoint",
+        "score": 0.85,
+        "type": "uniswap_v4_ai_innovation"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T17:05:35.528699",
+    "type": "detailed_priority",
+    "opportunity_count": 1,
+    "work_hours": true,
+    "opportunity_ids": [
+      "saucepoint_1234567890123456789"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "saucepoint",
+        "score": 0.91,
+        "type": "uniswap_v4_ai_innovation"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T17:06:27.078175",
+    "type": "detailed_priority",
+    "opportunity_count": 2,
+    "work_hours": true,
+    "opportunity_ids": [
+      "keyword_search_ai-powered_routing_1935009386394505295",
+      "keyword_search_ai-powered_routing_1935017763522883885"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "keyword_search_ai-powered_routing",
+        "score": 0.8550000000000001,
+        "type": "breakthrough_announcement"
+      },
+      {
+        "account": "keyword_search_ai-powered_routing",
+        "score": 0.775,
+        "type": "technical_discussion|breakthrough_announcement"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T17:12:37.263410",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": true,
+    "opportunity_ids": [
+      "saucepoint_1234567890123456789"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "saucepoint",
+        "score": 0.91,
+        "type": "uniswap_v4_ai_innovation"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T17:13:30.252200",
+    "type": "detailed_with_trending_topic",
+    "opportunity_count": 2,
+    "work_hours": true,
+    "opportunity_ids": [
+      "keyword_search_ai-powered_routing_1935017763522883885",
+      "keyword_search_ai-powered_routing_1935009386394505295"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "keyword_search_ai-powered_routing",
+        "score": 0.8550000000000001,
+        "type": "technical_discussion|breakthrough_announcement|collaboration"
+      },
+      {
+        "account": "keyword_search_ai-powered_routing",
+        "score": 0.8550000000000001,
+        "type": "breakthrough_announcement"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T17:17:31.950673",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": true,
+    "opportunity_ids": [
+      "saucepoint_1234567890123456789"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "saucepoint",
+        "score": 0.91,
+        "type": "uniswap_v4_ai_innovation"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T17:18:24.155310",
+    "type": "detailed_with_trending_topic",
+    "opportunity_count": 2,
+    "work_hours": true,
+    "opportunity_ids": [
+      "keyword_search_ai-powered_routing_1935017763522883885",
+      "keyword_search_ai-powered_routing_1935009386394505295"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "keyword_search_ai-powered_routing",
+        "score": 0.8550000000000001,
+        "type": "technical_discussion|breakthrough_announcement|collaboration"
+      },
+      {
+        "account": "keyword_search_ai-powered_routing",
+        "score": 0.8550000000000001,
+        "type": "technical_discussion|breakthrough_announcement"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-18T04:26:47.072410",
+    "type": "immediate",
+    "opportunity_count": 2,
+    "work_hours": false
+  },
+  {
+    "timestamp": "2025-06-17T17:27:15.642570",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": true,
+    "opportunity_ids": [
+      "saucepoint_1234567890123456789"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "saucepoint",
+        "score": 0.91,
+        "type": "uniswap_v4_ai_innovation"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T17:28:05.934600",
+    "type": "detailed_with_trending_topic",
+    "opportunity_count": 2,
+    "work_hours": true,
+    "opportunity_ids": [
+      "keyword_search_ai-powered_routing_1935009386394505295",
+      "keyword_search_ai-powered_routing_1935017763522883885"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "keyword_search_ai-powered_routing",
+        "score": 0.8550000000000001,
+        "type": "breakthrough_announcement"
+      },
+      {
+        "account": "keyword_search_ai-powered_routing",
+        "score": 0.775,
+        "type": "technical_discussion|breakthrough_announcement|collaboration"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T17:36:59.172409",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": true,
+    "opportunity_ids": [
+      "b652410b_20250617_17"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "SYSTEM_STARTUP",
+        "score": 0.85,
+        "type": "system_startup_verification"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T17:37:50.808541",
+    "type": "detailed_with_trending_topic",
+    "opportunity_count": 2,
+    "work_hours": true,
+    "opportunity_ids": [
+      "keyword_search_ai-powered_routing_1935017763522883885",
+      "keyword_search_ai-powered_routing_1935009386394505295"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "keyword_search_ai-powered_routing",
+        "score": 0.8300000000000001,
+        "type": "technical_discussion|breakthrough_announcement|collaboration"
+      },
+      {
+        "account": "keyword_search_ai-powered_routing",
+        "score": 0.8250000000000001,
+        "type": "breakthrough_announcement"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T17:45:56.465936",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": true,
+    "opportunity_ids": [
+      "b652410b_20250617_17"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "SYSTEM_STARTUP",
+        "score": 0.85,
+        "type": "system_startup_verification"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T17:47:07.002016",
+    "type": "detailed_with_trending_topic",
+    "opportunity_count": 2,
+    "work_hours": true,
+    "opportunity_ids": [
+      "keyword_search_uniswap_v4_hooks_1935047068441284870",
+      "keyword_search_uniswap_v4_hooks_1935026832103108845"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "keyword_search_uniswap_v4_hooks",
+        "score": 0.85,
+        "type": "breakthrough_announcement"
+      },
+      {
+        "account": "keyword_search_uniswap_v4_hooks",
+        "score": 0.755,
+        "type": "technical_discussion"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T18:10:04.352702",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": false,
+    "opportunity_ids": [
+      "b652410b_20250617_18"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "SYSTEM_STARTUP",
+        "score": 0.85,
+        "type": "system_startup_verification"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T18:11:06.316017",
+    "type": "detailed_with_trending_topic",
+    "opportunity_count": 2,
+    "work_hours": false,
+    "opportunity_ids": [
+      "keyword_search_v4_hook_architecture_1935041859673293043",
+      "keyword_search_uniswap_v4_hooks_1935047068441284870"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "keyword_search_v4_hook_architecture",
+        "score": 0.85,
+        "type": "technical_discussion|breakthrough_announcement"
+      },
+      {
+        "account": "keyword_search_uniswap_v4_hooks",
+        "score": 0.8250000000000001,
+        "type": "technical_discussion|breakthrough_announcement|collaboration"
+      }
+    ]
   }
 ]

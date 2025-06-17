@@ -472,8 +472,13 @@ class TrendMonitor:
                 # Determine response approach
                 suggested_approach = await self.suggest_keyword_response_approach(keyword, tweet)
                 
-                # Only create opportunities for relevant, positive-sentiment tweets
-                if relevance_score > 0.4 and sentiment_score > 0.3 and engagement_potential > 0.4:
+                # Enhanced filtering: Higher thresholds + shill detection + v4/Unichain focus
+                is_shill = await self._detect_shill_content(tweet_text)
+                has_v4_unichain_relevance = await self._check_v4_unichain_relevance(tweet_text, keyword)
+                
+                # Much stricter thresholds to avoid low-quality opportunities
+                if (relevance_score > 0.7 and sentiment_score > 0.5 and engagement_potential > 0.6 
+                    and not is_shill and has_v4_unichain_relevance):
                     opportunity = ContentOpportunity(
                         trigger_type='keyword_search',
                         context={
@@ -526,16 +531,23 @@ class TrendMonitor:
         return sentiment_map.get(sentiment.lower(), 0.5)
     
     async def calculate_keyword_relevance(self, keyword: str, tweet: Dict) -> float:
-        """Calculate how relevant a keyword search result is."""
+        """Calculate how relevant a keyword search result is with enhanced v4/Unichain focus."""
         text = tweet.get('text', '').lower()
         keyword_lower = keyword.lower()
         
         # Base relevance from keyword presence
         keyword_relevance = 1.0 if keyword_lower in text else 0.0
         
-        # Boost for question or discussion indicators
-        engagement_indicators = ['?', 'thoughts', 'opinion', 'what do you think', 'help', 'advice']
-        engagement_boost = sum(0.2 for indicator in engagement_indicators if indicator in text)
+        # Enhanced boost for technical discussions and questions
+        technical_indicators = ['how does', 'technical', 'implementation', 'architecture', 'protocol', 'smart contract']
+        discussion_indicators = ['?', 'thoughts', 'opinion', 'what do you think', 'insights', 'analysis']
+        
+        technical_boost = sum(0.3 for indicator in technical_indicators if indicator in text)
+        discussion_boost = sum(0.2 for indicator in discussion_indicators if indicator in text)
+        
+        # Specific v4/Unichain relevance boost
+        v4_terms = ['v4', 'hooks', 'unichain', 'concentrated liquidity', 'tick spacing']
+        v4_boost = sum(0.4 for term in v4_terms if term in text)
         
         # Check public metrics if available
         metrics = tweet.get('public_metrics', {})
@@ -543,16 +555,18 @@ class TrendMonitor:
         retweet_count = metrics.get('retweet_count', 0)
         reply_count = metrics.get('reply_count', 0)
         
-        # Boost for tweets with existing engagement
-        engagement_score = min((like_count + retweet_count + reply_count) / 10, 0.3)
+        # Higher threshold for engagement to ensure quality
+        engagement_score = min((like_count + retweet_count + reply_count) / 20, 0.3)
         
-        total_relevance = min(keyword_relevance + engagement_boost + engagement_score, 1.0)
+        total_relevance = min(keyword_relevance + technical_boost + discussion_boost + v4_boost + engagement_score, 1.0)
         
         logger.debug(
-            "keyword_relevance_calculated",
+            "enhanced_keyword_relevance_calculated",
             keyword=keyword,
             keyword_relevance=keyword_relevance,
-            engagement_boost=engagement_boost,
+            technical_boost=technical_boost,
+            discussion_boost=discussion_boost,
+            v4_boost=v4_boost,
             engagement_score=engagement_score,
             total_relevance=total_relevance
         )
@@ -593,6 +607,73 @@ class TrendMonitor:
         
         # Default to quote tweet for keyword matches
         return 'quote'
+    
+    async def _detect_shill_content(self, text: str) -> bool:
+        """Detect promotional/shill content that should be filtered out."""
+        text_lower = text.lower()
+        
+        # Common shill indicators
+        shill_indicators = [
+            'check out', 'alpha hunters', 'join our', 'exclusive access',
+            'limited time', 'don\'t miss out', 'revolutionary platform',
+            'game changer', 'next moonshot', 'hidden gem', 'secret alpha',
+            'redefining the standards', 'cutting edge tech', 'the future is here',
+            'exclusive', 'limited', 'join now', 'get in early', 'massive gains'
+        ]
+        
+        # Promotional patterns
+        promotional_patterns = [
+            'introducing', 'presenting', 'announcing', 'proud to announce',
+            'we are', 'our platform', 'our protocol', 'our solution'
+        ]
+        
+        # Check for multiple promotional indicators (likely shill)
+        shill_count = sum(1 for indicator in shill_indicators if indicator in text_lower)
+        promo_count = sum(1 for pattern in promotional_patterns if pattern in text_lower)
+        
+        # Too many promotional terms = likely shill
+        if shill_count >= 2 or promo_count >= 2:
+            return True
+            
+        # Check for excessive emoji or caps (common in shills)
+        emoji_count = sum(1 for char in text if ord(char) > 127)
+        caps_ratio = sum(1 for char in text if char.isupper()) / max(len(text), 1)
+        
+        if emoji_count > 5 or caps_ratio > 0.3:
+            return True
+            
+        return False
+    
+    async def _check_v4_unichain_relevance(self, text: str, keyword: str) -> bool:
+        """Check if content has genuine v4/Unichain technical relevance."""
+        text_lower = text.lower()
+        
+        # High-value v4/Unichain terms
+        core_terms = ['v4', 'unichain', 'hooks', 'concentrated liquidity', 'tick spacing']
+        technical_terms = [
+            'smart contract', 'protocol', 'implementation', 'architecture',
+            'mev', 'arbitrage', 'liquidity provision', 'yield farming',
+            'autonomous', 'algorithm', 'machine learning', 'neural network'
+        ]
+        
+        # Quality discussion indicators
+        discussion_quality = [
+            'technical analysis', 'deep dive', 'breakdown', 'explanation',
+            'how it works', 'implementation details', 'pros and cons',
+            'comparison', 'evaluation', 'research', 'study'
+        ]
+        
+        # Must have at least one core term
+        has_core_terms = any(term in text_lower for term in core_terms)
+        has_technical_depth = any(term in text_lower for term in technical_terms)
+        has_quality_discussion = any(term in text_lower for term in discussion_quality)
+        
+        # For generic keywords like "ai-powered routing", require higher relevance
+        if keyword in ['ai-powered routing', 'uniswap automation']:
+            return has_core_terms and (has_technical_depth or has_quality_discussion)
+        
+        # For specific v4/Unichain keywords, just need core terms + some technical context
+        return has_core_terms or has_technical_depth
     
     async def check_trending_topics(self) -> List[TrendingTopic]:
         """Monitor trending topics relevant to our interests."""
