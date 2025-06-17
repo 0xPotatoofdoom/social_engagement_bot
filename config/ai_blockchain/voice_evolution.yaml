@@ -58,41 +58,45 @@ content_generation:
     
   # Voice Tone Evolution
   tone_progression:
-    month_1: "helpful_technical"           # Helpful with technical elements
-    month_2: "confident_educational"       # More confident, still educational
-    month_3: "authoritative_approachable"  # Authority building, maintain accessibility
-    month_4: "thought_leader_engaging"     # Clear thought leadership, engaging
-    month_5: "innovation_expert"           # Innovation and trend expert
-    month_6: "ai_blockchain_authority"     # Recognized convergence authority
+    month_1: "helpful_technical_degen"           # Helpful with technical elements, crypto-native edge
+    month_2: "confident_educational_native"      # More confident, still educational, degen sensibilities
+    month_3: "authoritative_approachable_crypto" # Authority building, maintain accessibility, crypto-native
+    month_4: "thought_leader_engaging_degen"     # Clear thought leadership, engaging, degen vibes
+    month_5: "innovation_expert_native"          # Innovation and trend expert, crypto-native language
+    month_6: "ai_blockchain_authority_degen"     # Recognized convergence authority, degen credibility
 
 # Engagement Strategy Evolution
 engagement_strategy:
-  # Current Strategy
+  # Current Strategy  
   baseline_approach:
-    response_style: "enthusiastic_helpful"
-    technical_level: "basic_explanations"
-    authority_positioning: "learner_sharer"
+    response_style: "enthusiastic_helpful_degen"
+    technical_level: "basic_explanations_crypto_native"
+    authority_positioning: "learner_sharer_with_edge"
+    content_style: "clean_text_no_hashtags"
     
   # Phase 1 Evolution (Week 1-8)
   phase_1_approach:
-    response_style: "confident_helpful"
-    technical_level: "intermediate_insights"
-    authority_positioning: "knowledgeable_contributor"
+    response_style: "confident_helpful_degen"
+    technical_level: "intermediate_insights_crypto_native"
+    authority_positioning: "knowledgeable_contributor_with_edge"
     content_focus: "ai_blockchain_basics"
+    content_style: "clean_text_no_hashtags_degen_language"
     
-  # Phase 2 Evolution (Week 9-16)
+  # Phase 2 Evolution (Week 9-16)  
   phase_2_approach:
-    response_style: "authoritative_accessible"
-    technical_level: "advanced_analysis"
-    authority_positioning: "technical_expert"
+    response_style: "authoritative_accessible_degen"
+    technical_level: "advanced_analysis_crypto_native"
+    authority_positioning: "technical_expert_with_degen_cred"
     content_focus: "convergence_deep_dives"
+    content_style: "clean_authoritative_no_hashtags"
     
   # Phase 3 Evolution (Week 17-24)
   phase_3_approach:
-    response_style: "thought_leader_engaging"
-    technical_level: "cutting_edge_insights"
-    authority_positioning: "industry_thought_leader"
+    response_style: "thought_leader_engaging_degen"
+    technical_level: "cutting_edge_insights_crypto_native"
+    authority_positioning: "industry_thought_leader_degen_respected"
     content_focus: "innovation_predictions"
+    content_style: "clean_authoritative_crypto_native_no_hashtags"
 
 # Content Templates by Evolution Phase
 content_templates:
@@ -152,7 +156,7 @@ ab_testing:
   content_experiments:
     - thread_vs_reply_technical_depth
     - quote_vs_original_authority_positioning
-    - hashtag_ai_blockchain_vs_traditional
+    - clean_text_vs_emoji_heavy_content
     
   # Timing Testing
   timing_experiments:

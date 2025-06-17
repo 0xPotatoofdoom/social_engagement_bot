@@ -15,8 +15,9 @@ from pathlib import Path
 import structlog
 import os
 
-# Import enhanced logging
+# Import enhanced logging and feedback tracking
 from bot.utils.logging_config import get_monitoring_logger, get_email_logger
+from bot.analytics.feedback_tracker import get_feedback_tracker
 
 logger = get_monitoring_logger()
 
@@ -66,6 +67,10 @@ class AlertOpportunity:
     engagement_prediction: Optional[float] = None
     voice_alignment_score: Optional[float] = None
     
+    # Feedback tracking
+    feedback_id: Optional[str] = None
+    feedback_urls: Optional[Dict[str, str]] = None
+    
     def to_dict(self) -> Dict:
         return asdict(self)
 
@@ -94,8 +99,9 @@ class CronMonitorSystem:
         # Duplicate detection
         self.processed_opportunities: set = set()
         
-        # Email event logger
+        # Email event logger and feedback tracker
         self.email_logger = get_email_logger()
+        self.feedback_tracker = get_feedback_tracker()
         
         self._load_alert_history()
         self._load_processed_opportunities()
@@ -586,6 +592,12 @@ class CronMonitorSystem:
                     
                     # Generate content for this opportunity
                     await self._generate_opportunity_content(alert_opp)
+                    
+                    # Create feedback tracking for this opportunity
+                    feedback_id = self.feedback_tracker.create_opportunity_tracking(alert_opp.to_dict())
+                    alert_opp.feedback_id = feedback_id
+                    alert_opp.feedback_urls = self.feedback_tracker.generate_feedback_urls(feedback_id)
+                    
                     processed.append(alert_opp)
                     
                 elif 'keyword' in opp:
@@ -613,6 +625,12 @@ class CronMonitorSystem:
                     
                     # Generate content for this opportunity
                     await self._generate_opportunity_content(alert_opp)
+                    
+                    # Create feedback tracking for this opportunity
+                    feedback_id = self.feedback_tracker.create_opportunity_tracking(alert_opp.to_dict())
+                    alert_opp.feedback_id = feedback_id
+                    alert_opp.feedback_urls = self.feedback_tracker.generate_feedback_urls(feedback_id)
+                    
                     processed.append(alert_opp)
                     
             except Exception as e:
@@ -646,17 +664,20 @@ class CronMonitorSystem:
             Suggested Approach: {opportunity.suggested_response_type}
             
             Voice Guidelines:
-            - AI x blockchain technical authority
-            - Conversational yet authoritative
-            - Forward-thinking innovation expert
-            - Educational but confident
+            - AI x blockchain technical authority with degen sensibilities  
+            - Conversational yet authoritative - crypto-native language
+            - Forward-thinking innovation expert with edge
+            - Educational but confident - no academic fluff
+            - NEVER use hashtags - they're not part of this voice
+            - More direct, less corporate speak
             
             Generate a reply that:
             1. Demonstrates technical expertise in AI x blockchain convergence
-            2. Adds unique value to the conversation
+            2. Adds unique value to the conversation  
             3. Positions as thought leader in the space
             4. Stays under 280 characters
-            5. Includes relevant AI x blockchain insights
+            5. Uses crypto-native language and degen vibes
+            6. NO HASHTAGS - clean text only
             
             Provide your response as JSON with these exact keys:
             - primary_reply: Your main response (string, max 280 chars)
@@ -672,9 +693,11 @@ class CronMonitorSystem:
             async with self.claude_client:
                 voice_only = """
                 AI x blockchain technical authority voice:
-                - Conversational yet authoritative
-                - Forward-thinking innovation expert
-                - Educational but confident
+                - Conversational yet authoritative with degen edge
+                - Forward-thinking innovation expert - crypto-native language
+                - Educational but confident - no corporate fluff
+                - NEVER use hashtags - clean text only
+                - More direct, less formal - embrace the degen mindset
                 """
                 
                 response = await self.claude_client.generate_content(
@@ -833,6 +856,20 @@ class CronMonitorSystem:
             engagement_color = "#27ae60" if opp.engagement_prediction and opp.engagement_prediction >= 0.7 else "#f39c12" if opp.engagement_prediction and opp.engagement_prediction >= 0.5 else "#e74c3c"
             voice_color = "#27ae60" if opp.voice_alignment_score and opp.voice_alignment_score >= 0.8 else "#f39c12" if opp.voice_alignment_score and opp.voice_alignment_score >= 0.6 else "#e74c3c"
             
+            # Feedback URLs for this opportunity
+            feedback_urls = opp.feedback_urls if opp.feedback_urls else {}
+            excellent_url = feedback_urls.get('excellent', '#')
+            good_url = feedback_urls.get('good', '#')
+            okay_url = feedback_urls.get('okay', '#')
+            poor_url = feedback_urls.get('poor', '#')
+            bad_url = feedback_urls.get('bad', '#')
+            used_primary_url = feedback_urls.get('used_primary', '#')
+            used_alt1_url = feedback_urls.get('used_alt1', '#')
+            used_alt2_url = feedback_urls.get('used_alt2', '#')
+            used_custom_url = feedback_urls.get('used_custom', '#')
+            not_used_url = feedback_urls.get('not_used', '#')
+            feedback_id = opp.feedback_id or 'N/A'
+            
             opportunities_html += f"""
             <div style="border: 1px solid #ddd; margin: 20px 0; padding: 20px; border-radius: 10px; background: #fafafa;">
                 <h3 style="color: #2c3e50; margin-top: 0; border-bottom: 2px solid #3498db; padding-bottom: 8px;">
@@ -894,6 +931,72 @@ class CronMonitorSystem:
                        style="background: #e67e22; color: white; padding: 12px 20px; text-decoration: none; border-radius: 6px; margin: 5px; display: inline-block; font-weight: bold;">
                         🔄 Quote Tweet
                     </a>
+                </div>
+                
+                <!-- Feedback Section -->
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #6c757d;">
+                    <strong style="color: #495057;">📊 Feedback & Learning</strong><br>
+                    <div style="margin: 10px 0; font-size: 12px; color: #6c757d;">
+                        Help improve voice evolution by rating this opportunity and tracking reply usage:
+                    </div>
+                    
+                    <!-- Quality Rating Buttons -->
+                    <div style="margin: 8px 0;">
+                        <strong style="font-size: 12px; color: #495057;">Opportunity Quality:</strong><br>
+                        <div style="margin: 5px 0;">
+                            <a href="{excellent_url}" 
+                               style="background: #28a745; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                                ⭐⭐⭐⭐⭐ Excellent
+                            </a>
+                            <a href="{good_url}" 
+                               style="background: #20c997; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                                ⭐⭐⭐⭐ Good
+                            </a>
+                            <a href="{okay_url}" 
+                               style="background: #ffc107; color: black; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                                ⭐⭐⭐ Okay
+                            </a>
+                            <a href="{poor_url}" 
+                               style="background: #fd7e14; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                                ⭐⭐ Poor
+                            </a>
+                            <a href="{bad_url}" 
+                               style="background: #dc3545; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                                ⭐ Bad
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Reply Usage Tracking -->
+                    <div style="margin: 8px 0;">
+                        <strong style="font-size: 12px; color: #495057;">Reply Usage (click after posting):</strong><br>
+                        <div style="margin: 5px 0;">
+                            <a href="{used_primary_url}" 
+                               style="background: #007bff; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                                🎯 Used Primary Reply
+                            </a>
+                            <a href="{used_alt1_url}" 
+                               style="background: #6f42c1; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                                🔄 Used Alternative 1
+                            </a>
+                            <a href="{used_alt2_url}" 
+                               style="background: #e83e8c; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                                🔄 Used Alternative 2
+                            </a>
+                            <a href="{used_custom_url}" 
+                               style="background: #17a2b8; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                                ✏️ Used Custom Reply
+                            </a>
+                            <a href="{not_used_url}" 
+                               style="background: #6c757d; color: white; padding: 4px 8px; text-decoration: none; border-radius: 3px; margin: 2px; font-size: 11px; display: inline-block;">
+                                ❌ Didn't Use
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div style="font-size: 10px; color: #868e96; margin-top: 8px;">
+                        Feedback ID: {feedback_id} | This data helps evolve voice and content quality over time
+                    </div>
                 </div>
                 
                 <div style="text-align: center; margin-top: 15px; padding: 10px; background: #ecf0f1; border-radius: 6px; font-size: 12px; color: #7f8c8d;">

@@ -9,7 +9,7 @@ from pathlib import Path
 from datetime import datetime
 
 # Add src to path for imports
-sys.path.append('src')
+sys.path.append("../../src")
 
 def verify_strategic_accounts():
     """Verify and display all strategic accounts in the system"""

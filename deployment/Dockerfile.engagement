@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY src/ ./src/
 COPY data/ ./data/
-COPY *.py ./
+COPY x_engagement_service.py ./
 
 # Create data directories with proper permissions
 RUN mkdir -p /app/data/strategic_accounts /app/data/metrics /app/data/logs \

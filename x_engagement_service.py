@@ -28,6 +28,7 @@ from bot.api.x_client import XAPIClient
 from bot.api.claude_client import ClaudeAPIClient
 from bot.accounts.tracker import StrategicAccountTracker
 from bot.scheduling.cron_monitor import CronMonitorSystem, AlertConfiguration, AlertOpportunity
+from bot.web.feedback_server import start_feedback_server
 
 # Import enhanced logging system
 from bot.utils.logging_config import setup_logging, get_component_logger
@@ -257,17 +258,117 @@ class HealthServer:
             self.server.server_close()
 
 class HealthHandler(BaseHTTPRequestHandler):
-    """Health check request handler"""
+    """Health check and feedback request handler"""
     
     def do_GET(self):
+        from urllib.parse import urlparse
+        parsed_url = urlparse(self.path)
+        path_parts = parsed_url.path.strip('/').split('/')
+        
         if self.path == '/health':
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             self.wfile.write(b'{"status": "healthy", "service": "x_engagement_bot"}')
+        elif len(path_parts) >= 4 and path_parts[0] == 'feedback':
+            # Handle feedback endpoints: /feedback/{opportunity_id}/{type}/{value}
+            self._handle_feedback(path_parts[1], path_parts[2], path_parts[3])
         else:
             self.send_response(404)
             self.end_headers()
+    
+    def _handle_feedback(self, opportunity_id: str, feedback_type: str, value: str):
+        """Handle feedback endpoints"""
+        try:
+            from bot.analytics.feedback_tracker import get_feedback_tracker
+            
+            feedback_tracker = get_feedback_tracker()
+            success = False
+            message = ""
+            
+            if feedback_type == 'quality':
+                rating = int(value)
+                if 1 <= rating <= 5:
+                    success = feedback_tracker.record_quality_feedback(
+                        opportunity_id, rating, "Quality rating via email feedback"
+                    )
+                    message = f"Quality rating {rating} stars recorded for opportunity {opportunity_id}"
+                else:
+                    message = "Rating must be between 1 and 5"
+            elif feedback_type == 'reply':
+                valid_types = ['primary', 'alt1', 'alt2', 'custom', 'none']
+                if value in valid_types:
+                    success = feedback_tracker.record_reply_selection(opportunity_id, value)
+                    reply_labels = {
+                        'primary': 'Primary reply',
+                        'alt1': 'Alternative 1',
+                        'alt2': 'Alternative 2', 
+                        'custom': 'Custom reply',
+                        'none': 'No reply used'
+                    }
+                    message = f"{reply_labels[value]} usage recorded for opportunity {opportunity_id}"
+                else:
+                    message = f"Invalid reply type. Must be one of: {valid_types}"
+            else:
+                message = "Invalid feedback type"
+            
+            if success:
+                self._send_success_page(message)
+            else:
+                self._send_error_page(message)
+                
+        except Exception as e:
+            logger.error(f"Feedback handling error: {e}")
+            self._send_error_page(f"Internal error: {e}")
+    
+    def _send_success_page(self, message: str):
+        """Send success feedback page"""
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        
+        html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head><title>Feedback Recorded</title><style>
+        body {{ font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }}
+        .success {{ background: #d4edda; color: #155724; padding: 20px; border-radius: 8px; }}
+        </style></head>
+        <body>
+        <h1>🎯 X Engagement Bot Feedback</h1>
+        <div class="success">
+        <h3>✅ Feedback Recorded Successfully</h3>
+        <p>{message}</p>
+        <p>Thank you for helping improve the voice evolution system!</p>
+        </div>
+        <button onclick="window.close()">Close Window</button>
+        </body></html>
+        """
+        self.wfile.write(html.encode())
+    
+    def _send_error_page(self, message: str):
+        """Send error feedback page"""
+        self.send_response(400)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        
+        html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head><title>Feedback Error</title><style>
+        body {{ font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }}
+        .error {{ background: #f8d7da; color: #721c24; padding: 20px; border-radius: 8px; }}
+        </style></head>
+        <body>
+        <h1>🎯 X Engagement Bot Feedback</h1>
+        <div class="error">
+        <h3>❌ Feedback Error</h3>
+        <p>{message}</p>
+        </div>
+        <button onclick="window.close()">Close Window</button>
+        </body></html>
+        """
+        self.wfile.write(html.encode())
     
     def log_message(self, format, *args):
         pass  # Suppress HTTP logs
@@ -478,6 +579,9 @@ class XEngagementService:
         
         # Start health server
         self.health_server.start()
+        
+        # Feedback endpoints now handled by health server on port 8080
+        logger.info("✅ Feedback endpoints enabled on main health server (port 8080)")
         
         # Initialize clients without health check
         if not await self.initialize_clients():

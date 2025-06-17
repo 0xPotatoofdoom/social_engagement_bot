@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 import sys
 
 # Add src to path for imports
-sys.path.append('src')
+sys.path.append("../../src")
 
 from bot.api.x_client import XAPIClient
 from bot.api.claude_client import ClaudeAPIClient

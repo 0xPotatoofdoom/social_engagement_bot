@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # Add src to path
-sys.path.append('src')
+sys.path.append("../../src")
 
 @dataclass
 class ROIMetrics:

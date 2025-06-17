@@ -327,15 +327,22 @@ YOUR EXPERTISE: {', '.join(target_topics)}
 
 {f'VOICE GUIDELINES: {voice_guidelines}' if voice_guidelines else 'VOICE: Professional but approachable, knowledgeable without being condescending'}
 
+CRITICAL RULES:
+- NEVER use hashtags (#) in any content - they are not part of this voice
+- Use crypto-native language and degen sensibilities
+- Be direct and authoritative without corporate speak
+- Clean text only - no hashtags or excessive emojis
+
 Please generate engaging content and provide a JSON response with:
-1. content: The actual tweet/post content (max 280 characters)
+1. content: The actual tweet/post content (max 280 characters, NO HASHTAGS)
 2. content_type: "{opportunity_type}"
 3. confidence: 0.0 to 1.0 (how confident you are this will be well-received)
 4. reasoning: Brief explanation of your approach
-5. alternatives: Array of 2-3 alternative versions
+5. alternatives: Array of 2-3 alternative versions (also NO HASHTAGS)
 6. estimated_engagement: 0.0 to 1.0 (predicted engagement potential)
 
-Make it valuable, authentic, and likely to generate positive engagement."""
+Make it valuable, authentic, crypto-native, and likely to generate positive engagement.
+"""
         
         return base_prompt
     

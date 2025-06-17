@@ -55,7 +55,7 @@ def build_and_run():
     # Build image
     build_cmd = [
         'docker', 'build', 
-        '-f', 'Dockerfile.engagement', 
+        '-f', 'deployment/Dockerfile.engagement', 
         '-t', 'x-engagement-bot', 
         '.'
     ]
@@ -215,7 +215,7 @@ def main():
     print("1. Monitor logs to see system activity")
     print("2. Check email for opportunity alerts")
     print("3. Wait 24-48 hours for meaningful ROI data")
-    print("4. Run: python roi_analysis.py to check performance")
+    print("4. Run: python scripts/analysis/roi_analysis.py to check performance")
     
     return True
 
