@@ -81,13 +81,18 @@ class CronMonitorSystem:
         self.monitoring_active = False
         self.data_dir = Path("data/strategic_accounts")
         self.alerts_file = self.data_dir / "alert_history.json"
+        self.processed_file = self.data_dir / "processed_opportunities.json"
         
         # Alert tracking
         self.alert_history: List[Dict] = []
         self.last_digest_sent = None
         self.daily_opportunities: List[AlertOpportunity] = []
         
+        # Duplicate detection
+        self.processed_opportunities: set = set()
+        
         self._load_alert_history()
+        self._load_processed_opportunities()
         
         logger.info(
             "cron_monitor_initialized",
@@ -102,10 +107,80 @@ class CronMonitorSystem:
             if self.alerts_file.exists():
                 with open(self.alerts_file, 'r') as f:
                     self.alert_history = json.load(f)
-                logger.info(f"Loaded {len(self.alert_history)} alert history records")
+            else:
+                self.alert_history = []
+            logger.info(f"Loaded {len(self.alert_history)} alert history records")
         except Exception as e:
             logger.error(f"Error loading alert history: {e}")
             self.alert_history = []
+    
+    def _load_processed_opportunities(self):
+        """Load processed opportunities from persistent storage"""
+        try:
+            if self.processed_file.exists():
+                with open(self.processed_file, 'r') as f:
+                    data = json.load(f)
+                    self.processed_opportunities = set(data.get('processed_ids', []))
+                    logger.info(f"Loaded {len(self.processed_opportunities)} processed opportunity IDs")
+            else:
+                self.processed_opportunities = set()
+                logger.info("No processed opportunities file found, starting fresh")
+        except Exception as e:
+            logger.error(f"Error loading processed opportunities: {e}")
+            self.processed_opportunities = set()
+    
+    def _save_processed_opportunities(self):
+        """Save processed opportunities to persistent storage"""
+        try:
+            self.data_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Keep only last 10,000 entries to prevent unlimited growth
+            if len(self.processed_opportunities) > 10000:
+                self.processed_opportunities = set(list(self.processed_opportunities)[-5000:])
+            
+            data = {
+                'processed_ids': list(self.processed_opportunities),
+                'last_updated': datetime.now().isoformat()
+            }
+            
+            with open(self.processed_file, 'w') as f:
+                json.dump(data, f, indent=2)
+        except Exception as e:
+            logger.error(f"Error saving processed opportunities: {e}")
+    
+    def _get_opportunity_id(self, opportunity: AlertOpportunity) -> str:
+        """Generate unique ID for opportunity to prevent duplicates"""
+        import hashlib
+        
+        # For test opportunities, use a daily key
+        if opportunity.account_username == "TestAccount":
+            return f"test_opportunity_{datetime.now().strftime('%Y-%m-%d')}"
+        
+        # For real opportunities, try to extract tweet ID from URL
+        if opportunity.content_url and "/status/" in opportunity.content_url:
+            try:
+                tweet_id = opportunity.content_url.split("/status/")[-1].split("?")[0]
+                return f"{opportunity.account_username}_{tweet_id}"
+            except:
+                pass
+        
+        # Fallback: hash content + account + hour bucket
+        content_key = f"{opportunity.account_username}_{opportunity.content_text[:100]}"
+        content_hash = hashlib.md5(content_key.encode()).hexdigest()[:8]
+        hour_bucket = datetime.now().strftime('%Y%m%d_%H')
+        return f"{content_hash}_{hour_bucket}"
+    
+    def _is_opportunity_processed(self, opportunity: AlertOpportunity) -> bool:
+        """Check if opportunity has already been processed"""
+        opp_id = self._get_opportunity_id(opportunity)
+        return opp_id in self.processed_opportunities
+    
+    def _mark_opportunity_processed(self, opportunity: AlertOpportunity):
+        """Mark opportunity as processed to prevent duplicates"""
+        opp_id = self._get_opportunity_id(opportunity)
+        self.processed_opportunities.add(opp_id)
+        self._save_processed_opportunities()
+        logger.debug(f"Marked opportunity as processed: {opp_id}")
     
     def _save_alert_history(self):
         """Save alert history to persistent storage"""
@@ -159,15 +234,15 @@ class CronMonitorSystem:
             # Skip strategic accounts for now to avoid rate limits
             logger.info("Skipping strategic account monitoring to avoid rate limits")
             
-            # Simple test: create a direct AlertOpportunity to test email system
-            logger.info("Creating test alert opportunity")
+            # Create test alert only if not already sent today
+            logger.info("Checking if test alert needed")
             from bot.scheduling.cron_monitor import AlertOpportunity
             
             test_alert = AlertOpportunity(
                 account_username="TestAccount",
                 account_tier=1,
-                content_text="Test AI x blockchain opportunity for email verification",
-                content_url="https://twitter.com/test/status/123",
+                content_text=f"Daily AI x blockchain test opportunity - {datetime.now().strftime('%Y-%m-%d')}",
+                content_url=f"https://twitter.com/test/status/{datetime.now().strftime('%Y%m%d')}",
                 timestamp=datetime.now().isoformat(),
                 
                 overall_score=0.85,
@@ -177,17 +252,24 @@ class CronMonitorSystem:
                 suggested_response_type="test_response",
                 time_sensitivity="immediate",
                 
-                strategic_context="Test opportunity to verify email system",
+                strategic_context="Daily test opportunity to verify email system",
                 suggested_response="Test the email alert system",
                 
-                generated_reply="This is a test reply to verify the email system is working correctly.",
+                generated_reply="This is a daily test reply to verify the email system is working correctly.",
                 reply_reasoning="Testing email system functionality",
                 alternative_responses=["Test alternative 1", "Test alternative 2"],
                 engagement_prediction=0.75,
                 voice_alignment_score=0.80
             )
             
-            processed_opportunities = [test_alert]
+            # Filter out duplicates
+            processed_opportunities = []
+            if not self._is_opportunity_processed(test_alert):
+                processed_opportunities.append(test_alert)
+                self._mark_opportunity_processed(test_alert)
+                logger.info("New test opportunity created and marked as processed")
+            else:
+                logger.info("Test opportunity already sent today, skipping duplicate")
             
             # 4. Send alerts based on priority
             await self._send_priority_alerts(processed_opportunities)
@@ -677,7 +759,7 @@ class CronMonitorSystem:
             await self._send_email(subject, html_content)
             
             # Record alert
-            self._record_alert('immediate', len(opportunities))
+            self._record_alert('immediate', len(opportunities), opportunities)
             
             logger.info(f"Sent immediate alert for {len(opportunities)} opportunities")
             
@@ -698,7 +780,7 @@ class CronMonitorSystem:
             await self._send_email(subject, html_content)
             
             # Record alert
-            self._record_alert('priority', len(opportunities))
+            self._record_alert('priority', len(opportunities), opportunities)
             
             logger.info(f"Sent priority alert for {len(opportunities)} opportunities")
             
@@ -880,14 +962,25 @@ class CronMonitorSystem:
         except Exception as e:
             logger.error(f"Error sending email: {e}")
     
-    def _record_alert(self, alert_type: str, opportunity_count: int):
-        """Record alert in history"""
+    def _record_alert(self, alert_type: str, opportunity_count: int, opportunities: List[AlertOpportunity] = None):
+        """Record alert in history with opportunity details"""
         alert_record = {
             'timestamp': datetime.now().isoformat(),
             'type': alert_type,
             'opportunity_count': opportunity_count,
             'work_hours': self._is_work_hours(datetime.now())
         }
+        
+        # Add opportunity IDs and summary details for deduplication tracking
+        if opportunities:
+            alert_record['opportunity_ids'] = [self._get_opportunity_id(opp) for opp in opportunities]
+            alert_record['opportunity_summary'] = [
+                {
+                    'account': opp.account_username,
+                    'score': opp.overall_score,
+                    'type': opp.opportunity_type
+                } for opp in opportunities[:5]  # Store details for first 5
+            ]
         
         self.alert_history.append(alert_record)
         self._save_alert_history()
@@ -931,7 +1024,7 @@ class CronMonitorSystem:
             await self._send_email(subject, html_content)
             
             # Record digest
-            self._record_alert('daily_digest', len(digest_opportunities))
+            self._record_alert('daily_digest', len(digest_opportunities), digest_opportunities)
             
             # Reset daily opportunities
             self.daily_opportunities = []
