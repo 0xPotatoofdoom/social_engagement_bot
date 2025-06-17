@@ -1,0 +1,32 @@
+[
+  {
+    "timestamp": "2025-06-17T20:52:46.296386",
+    "type": "immediate",
+    "opportunity_count": 3,
+    "work_hours": false
+  },
+  {
+    "timestamp": "2025-06-17T21:02:11.955599",
+    "type": "immediate",
+    "opportunity_count": 3,
+    "work_hours": false
+  },
+  {
+    "timestamp": "2025-06-17T21:03:20.501112",
+    "type": "immediate",
+    "opportunity_count": 3,
+    "work_hours": false
+  },
+  {
+    "timestamp": "2025-06-17T21:16:34.169148",
+    "type": "immediate",
+    "opportunity_count": 3,
+    "work_hours": false
+  },
+  {
+    "timestamp": "2025-06-17T21:29:34.263894",
+    "type": "immediate",
+    "opportunity_count": 0,
+    "work_hours": false
+  }
+]

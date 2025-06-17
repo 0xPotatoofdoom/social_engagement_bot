@@ -1,0 +1,303 @@
+# AI x Blockchain Strategic Keywords Configuration
+# Enhanced keyword sets for convergence topic monitoring and opportunity detection
+
+# Core Keyword Categories
+keyword_categories:
+  
+  # AI Agents & Autonomous Trading
+  ai_agents:
+    primary:
+      - "ai agents blockchain"
+      - "autonomous trading"
+      - "intelligent contracts"
+      - "machine learning defi"
+      - "ai infrastructure crypto"
+      - "ml protocols"
+    
+    secondary:
+      - "autonomous agents crypto"
+      - "ai powered trading"
+      - "intelligent automation"
+      - "ml blockchain integration"
+      - "ai contract execution"
+      - "autonomous protocol"
+    
+    technical:
+      - "ai agent architecture blockchain"
+      - "autonomous trading algorithms"
+      - "intelligent contract deployment"
+      - "ml model blockchain inference"
+      - "ai infrastructure scaling"
+      - "multi agent crypto systems"
+      
+  # HFT & AI Integration  
+  hft_ai:
+    primary:
+      - "hft ai"
+      - "algorithmic trading defi"
+      - "ml trading"
+      - "quantitative crypto"
+      - "ai trading strategies"
+      - "predictive trading"
+    
+    secondary:
+      - "high frequency ai"
+      - "algorithmic defi strategies"
+      - "machine learning arbitrage"
+      - "quantitative blockchain"
+      - "ai market making"
+      - "predictive algorithms crypto"
+    
+    technical:
+      - "hft ai architecture"
+      - "low latency ml trading"
+      - "quantitative crypto models"
+      - "ai arbitrage optimization"
+      - "predictive market microstructure"
+      - "algorithmic liquidity provision"
+      
+  # Uniswap v4 & AI Specific
+  uniswap_v4_ai:
+    primary:
+      - "v4 hooks ai"
+      - "uniswap automation"
+      - "smart routing ai" 
+      - "predictive mev"
+      - "intelligent hooks"
+      - "automated arbitrage"
+    
+    secondary:
+      - "uniswap v4 machine learning"
+      - "ai enhanced amm"
+      - "intelligent swap routing"
+      - "predictive pool management"
+      - "automated hook execution"
+      - "ai mev protection"
+    
+    technical:
+      - "v4 hook ai integration"
+      - "uniswap ai routing optimization"
+      - "ml powered swap execution"
+      - "predictive mev algorithms"
+      - "intelligent pool rebalancing"
+      - "automated arbitrage strategies"
+      
+  # Technical Convergence
+  convergence:
+    primary:
+      - "ai blockchain convergence"
+      - "next generation defi"
+      - "intelligent infrastructure"
+      - "autonomous protocols"
+      - "machine learning trading"
+      - "predictive analytics crypto"
+    
+    secondary:
+      - "ai enhanced blockchain"
+      - "intelligent crypto protocols"
+      - "ml blockchain optimization"
+      - "predictive defi systems"
+      - "autonomous crypto networks"
+      - "ai protocol governance"
+    
+    technical:
+      - "ai blockchain architecture patterns"
+      - "ml consensus mechanisms"
+      - "intelligent protocol design"
+      - "autonomous governance systems"
+      - "predictive network optimization"
+      - "ai enhanced scalability"
+      
+  # Innovation Indicators
+  innovation:
+    primary:
+      - "ai powered defi"
+      - "intelligent amm"
+      - "autonomous market makers"
+      - "ai enhanced protocols"
+      - "smart contract ai"
+      - "blockchain machine learning"
+    
+    secondary:
+      - "ai native protocols"
+      - "intelligent yield farming"
+      - "autonomous liquidity management"
+      - "ai enhanced governance"
+      - "predictive protocol optimization"
+      - "ml powered consensus"
+    
+    technical:
+      - "ai native protocol architecture"
+      - "intelligent yield optimization"
+      - "autonomous pool management"
+      - "ai enhanced consensus protocols"
+      - "predictive gas optimization"
+      - "ml powered network effects"
+
+# Search Strategy Configuration
+search_strategy:
+  
+  # Priority Levels for Monitoring
+  priority_keywords:
+    tier_1: # Check every 15 minutes
+      - "ai agents blockchain"
+      - "v4 hooks ai"
+      - "autonomous trading"
+      - "ai blockchain convergence"
+      - "predictive mev"
+      
+    tier_2: # Check every 30 minutes  
+      - "machine learning defi"
+      - "intelligent contracts"
+      - "hft ai"
+      - "uniswap automation"
+      - "ai trading strategies"
+      
+    tier_3: # Check every 60 minutes
+      - "algorithmic trading defi"
+      - "smart routing ai"
+      - "predictive trading"
+      - "ai enhanced protocols"
+      - "intelligent infrastructure"
+  
+  # Query Construction Patterns
+  query_patterns:
+    exact_match: '"{keyword}"'
+    broad_match: '{keyword}'
+    technical_discussion: '"{keyword}" (implementation OR architecture OR framework)'
+    breaking_news: '"{keyword}" (announced OR launched OR released OR new)'
+    collaboration: '"{keyword}" (collaborate OR partnership OR integration)'
+    
+  # Search Filters
+  filters:
+    exclude_retweets: "-is:retweet"
+    english_only: "lang:en"
+    minimum_engagement: "min_replies:1 OR min_retweets:1 OR min_faves:2"
+    time_range: "since:24h"  # Last 24 hours
+    
+# Content Analysis Framework
+analysis_framework:
+  
+  # Relevance Scoring Weights
+  relevance_weights:
+    keyword_match: 0.30
+    ai_term_density: 0.25
+    blockchain_term_density: 0.25
+    technical_depth: 0.20
+    
+  # AI Term Categories
+  ai_terms:
+    core: ["ai", "artificial intelligence", "machine learning", "ml"]
+    advanced: ["neural", "algorithm", "predictive", "intelligent", "autonomous"]
+    technical: ["model", "inference", "training", "optimization", "framework"]
+    
+  # Blockchain Term Categories  
+  blockchain_terms:
+    core: ["blockchain", "crypto", "defi", "protocol"]
+    platforms: ["ethereum", "uniswap", "unichain", "polygon"]
+    technical: ["smart contract", "amm", "dex", "mev", "hooks", "consensus"]
+    
+  # Technical Depth Indicators
+  technical_indicators:
+    high: ["implementation", "architecture", "framework", "optimization", "performance"]
+    medium: ["integration", "development", "design", "solution", "approach"]
+    low: ["overview", "introduction", "basics", "simple", "easy"]
+    
+  # Innovation Indicators
+  innovation_signals:
+    breakthrough: ["breakthrough", "revolutionary", "paradigm", "game-changing"]
+    emerging: ["emerging", "novel", "cutting-edge", "next-generation"]
+    trends: ["trend", "future", "evolution", "advancement", "progress"]
+
+# Opportunity Scoring Framework
+opportunity_scoring:
+  
+  # Score Components (0-1 scale each)
+  scoring_components:
+    ai_blockchain_relevance: 0.30    # How relevant to AI x blockchain convergence
+    technical_depth: 0.25            # Technical complexity and depth
+    engagement_potential: 0.20       # Likelihood of driving engagement
+    strategic_value: 0.15            # Value for strategic positioning
+    time_sensitivity: 0.10           # Urgency of response needed
+    
+  # Threshold Levels
+  thresholds:
+    immediate_alert: 0.80     # Send immediate email alert
+    priority_alert: 0.65      # Send within 1 hour
+    daily_digest: 0.45        # Include in daily digest
+    monitoring_only: 0.25     # Track but no alert
+    
+  # Opportunity Types
+  opportunity_types:
+    technical_discussion:
+      keywords: ["implementation", "architecture", "how to", "best practices"]
+      response_approach: "technical_insight"
+      
+    breakthrough_announcement:
+      keywords: ["announced", "launched", "breakthrough", "revolutionary"]
+      response_approach: "analysis_commentary"
+      
+    collaboration_request:
+      keywords: ["collaborate", "partnership", "looking for", "need help"]
+      response_approach: "collaboration_offer"
+      
+    educational_content:
+      keywords: ["explain", "understand", "learn", "tutorial", "guide"]
+      response_approach: "educational_support"
+      
+    trend_prediction:
+      keywords: ["future", "prediction", "trend", "evolution", "next"]
+      response_approach: "forward_thinking_analysis"
+
+# Monitoring Configuration
+monitoring_config:
+  
+  # Search Frequency by Priority
+  search_intervals:
+    tier_1_keywords: 15    # minutes
+    tier_2_keywords: 30    # minutes  
+    tier_3_keywords: 60    # minutes
+    
+  # Rate Limiting
+  rate_limits:
+    searches_per_minute: 10
+    delay_between_searches: 6  # seconds
+    daily_search_budget: 2000
+    
+  # Results Processing
+  results_processing:
+    max_results_per_keyword: 20
+    duplicate_detection: true
+    sentiment_analysis: true
+    strategic_account_boost: true  # Boost content from strategic accounts
+    
+  # Alert Configuration  
+  alert_settings:
+    work_hours_only: true
+    consolidate_similar: true      # Group similar opportunities
+    max_alerts_per_hour: 5
+    daily_digest_time: "18:00"
+    
+# Performance Optimization
+optimization:
+  
+  # Keyword Performance Tracking
+  performance_metrics:
+    - opportunity_discovery_rate
+    - false_positive_rate  
+    - engagement_success_rate
+    - strategic_value_realization
+    
+  # Adaptive Keyword Management
+  adaptive_management:
+    promote_high_performers: true   # Increase frequency for productive keywords
+    demote_low_performers: true     # Decrease frequency for unproductive keywords
+    retire_dead_keywords: true      # Remove keywords with no opportunities
+    discover_new_keywords: true     # Add related keywords from successful content
+    
+  # Learning Integration
+  learning_feedback:
+    track_manual_selections: true   # Learn from what opportunities user selects
+    analyze_engagement_outcomes: true  # Track success of generated responses
+    optimize_scoring_weights: true  # Adjust scoring based on performance
+    refine_keyword_targeting: true  # Improve keyword selection over time

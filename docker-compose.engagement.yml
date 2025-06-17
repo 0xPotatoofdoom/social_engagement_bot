@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  x-engagement-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.engagement
+    container_name: x_engagement_bot
+    restart: unless-stopped
+    
+    environment:
+      # X API Configuration
+      - X_API_KEY=${X_API_KEY}
+      - X_API_SECRET=${X_API_SECRET}
+      - X_ACCESS_TOKEN=${X_ACCESS_TOKEN}
+      - X_ACCESS_TOKEN_SECRET=${X_ACCESS_TOKEN_SECRET}
+      - X_BEARER_TOKEN=${X_BEARER_TOKEN}
+      
+      # Claude API Configuration
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+      
+      # Email Configuration
+      - SMTP_SERVER=${SMTP_SERVER:-smtp.gmail.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SENDER_EMAIL=${SENDER_EMAIL}
+      - SENDER_PASSWORD=${SENDER_PASSWORD}
+      - RECIPIENT_EMAIL=${RECIPIENT_EMAIL}
+      
+      # Monitoring Configuration
+      - MONITORING_INTERVAL=${MONITORING_INTERVAL:-1800}  # 30 minutes
+      - METRICS_INTERVAL=${METRICS_INTERVAL:-3600}        # 1 hour
+      - REPORT_INTERVAL=${REPORT_INTERVAL:-86400}         # 24 hours
+      
+      # Rate Limiting Configuration
+      - AGGRESSIVE_MONITORING=${AGGRESSIVE_MONITORING:-false}
+      - MAX_API_CALLS_PER_HOUR=${MAX_API_CALLS_PER_HOUR:-100}
+      
+    volumes:
+      # Persistent data storage
+      - ./data:/app/data
+      - ./logs:/app/data/logs
+      
+    ports:
+      - "8080:8080"  # Health check endpoint
+      
+    networks:
+      - monitoring-network
+      
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+      
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Optional: Metrics dashboard (lightweight)
+  metrics-dashboard:
+    image: nginx:alpine
+    container_name: metrics_dashboard
+    restart: unless-stopped
+    
+    volumes:
+      - ./dashboard:/usr/share/nginx/html:ro
+      - ./data/metrics:/usr/share/nginx/html/data:ro
+      
+    ports:
+      - "8081:80"
+      
+    networks:
+      - monitoring-network
+      
+    depends_on:
+      - x-engagement-bot
+
+networks:
+  monitoring-network:
+    driver: bridge
+
+volumes:
+  monitoring-data:
