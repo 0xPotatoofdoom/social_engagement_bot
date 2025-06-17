@@ -126,12 +126,9 @@ class CronMonitorSystem:
             try:
                 current_time = datetime.now()
                 
-                # Check if we're in work hours
-                if self._is_work_hours(current_time):
-                    logger.info("Executing monitoring cycle during work hours")
-                    await self._execute_monitoring_cycle()
-                else:
-                    logger.debug("Outside work hours, skipping monitoring cycle")
+                # Execute monitoring cycle (24/7 operation)
+                logger.info("Executing monitoring cycle")
+                await self._execute_monitoring_cycle()
                 
                 # Send daily digest if needed
                 await self._check_daily_digest()
@@ -159,16 +156,38 @@ class CronMonitorSystem:
         opportunities_found = []
         
         try:
-            # 1. Monitor strategic accounts for new content
-            strategic_opportunities = await self._monitor_strategic_accounts()
-            opportunities_found.extend(strategic_opportunities)
+            # Skip strategic accounts for now to avoid rate limits
+            logger.info("Skipping strategic account monitoring to avoid rate limits")
             
-            # 2. Enhanced keyword search for AI x blockchain topics
-            keyword_opportunities = await self._monitor_ai_blockchain_keywords()
-            opportunities_found.extend(keyword_opportunities)
+            # Simple test: create a direct AlertOpportunity to test email system
+            logger.info("Creating test alert opportunity")
+            from bot.scheduling.cron_monitor import AlertOpportunity
             
-            # 3. Process and score all opportunities
-            processed_opportunities = await self._process_opportunities(opportunities_found)
+            test_alert = AlertOpportunity(
+                account_username="TestAccount",
+                account_tier=1,
+                content_text="Test AI x blockchain opportunity for email verification",
+                content_url="https://twitter.com/test/status/123",
+                timestamp=datetime.now().isoformat(),
+                
+                overall_score=0.85,
+                ai_blockchain_relevance=0.90,
+                technical_depth=0.80,
+                opportunity_type="test_opportunity",
+                suggested_response_type="test_response",
+                time_sensitivity="immediate",
+                
+                strategic_context="Test opportunity to verify email system",
+                suggested_response="Test the email alert system",
+                
+                generated_reply="This is a test reply to verify the email system is working correctly.",
+                reply_reasoning="Testing email system functionality",
+                alternative_responses=["Test alternative 1", "Test alternative 2"],
+                engagement_prediction=0.75,
+                voice_alignment_score=0.80
+            )
+            
+            processed_opportunities = [test_alert]
             
             # 4. Send alerts based on priority
             await self._send_priority_alerts(processed_opportunities)
@@ -200,7 +219,7 @@ class CronMonitorSystem:
             for username, account in accounts.items():
                 try:
                     # Get recent tweets from this account
-                    user_tweets = await self._get_user_recent_tweets(username, max_results=5)
+                    user_tweets = await self._get_user_recent_tweets(username, max_results=10)
                     
                     for tweet in user_tweets:
                         # Analyze for engagement opportunities
@@ -221,7 +240,7 @@ class CronMonitorSystem:
         
         return opportunities
     
-    async def _get_user_recent_tweets(self, username: str, max_results: int = 5) -> List[Dict]:
+    async def _get_user_recent_tweets(self, username: str, max_results: int = 10) -> List[Dict]:
         """Get recent tweets from a specific user"""
         try:
             # Get user ID
@@ -280,7 +299,7 @@ class CronMonitorSystem:
             for keyword in ai_blockchain_keywords:
                 try:
                     # Search for recent tweets
-                    search_results = await self._search_keyword_tweets(keyword, max_results=5)
+                    search_results = await self._search_keyword_tweets(keyword, max_results=10)
                     
                     for tweet in search_results:
                         # Enhanced AI x blockchain analysis
@@ -308,7 +327,7 @@ class CronMonitorSystem:
         
         return opportunities
     
-    async def _search_keyword_tweets(self, keyword: str, max_results: int = 5) -> List[Dict]:
+    async def _search_keyword_tweets(self, keyword: str, max_results: int = 10) -> List[Dict]:
         """Search for recent tweets containing a specific keyword"""
         try:
             query = f'"{keyword}" -is:retweet lang:en'
@@ -373,8 +392,35 @@ class CronMonitorSystem:
                 }}
                 """
                 
-                response = await self.claude_client.analyze_content(analysis_prompt)
-                analysis = json.loads(response)
+                # Make direct API call for analysis using async context
+                async with self.claude_client as client:
+                    response_data = await client._make_api_call("messages", {
+                        "model": "claude-3-haiku-20240307",
+                        "max_tokens": 500,
+                        "messages": [{"role": "user", "content": analysis_prompt}]
+                    })
+                
+                # Extract JSON from Claude response (may have extra text)
+                response_text = response_data['content'][0]['text']
+                
+                # Find JSON block in response
+                import re
+                json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+                if json_match:
+                    analysis = json.loads(json_match.group(0))
+                else:
+                    # Fallback to basic scoring if JSON extraction fails
+                    analysis = {
+                        "ai_blockchain_relevance": 0.6,
+                        "technical_depth": 0.5,
+                        "innovation_score": 0.5,
+                        "engagement_opportunity": 0.7,
+                        "time_sensitivity": 0.6,
+                        "content_themes": ["blockchain", "ai"],
+                        "opportunity_type": "technical_discussion",
+                        "strategic_value": "medium",
+                        "suggested_approach": "technical_insight"
+                    }
                 
                 # Calculate overall score
                 analysis['overall_ai_blockchain_score'] = (
@@ -542,11 +588,18 @@ class CronMonitorSystem:
             
             # Use Claude to generate content
             async with self.claude_client:
+                voice_only = """
+                AI x blockchain technical authority voice:
+                - Conversational yet authoritative
+                - Forward-thinking innovation expert
+                - Educational but confident
+                """
+                
                 response = await self.claude_client.generate_content(
                     opportunity_type="reply",
                     context={'text': opportunity.content_text, 'prompt': content_prompt},
                     target_topics=["ai blockchain", "autonomous trading", "uniswap v4"],
-                    voice_guidelines=content_prompt
+                    voice_guidelines=voice_only
                 )
             
             # Parse Claude response

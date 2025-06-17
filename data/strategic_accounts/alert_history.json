@@ -28,5 +28,65 @@
     "type": "immediate",
     "opportunity_count": 0,
     "work_hours": false
+  },
+  {
+    "timestamp": "2025-06-17T12:10:26.990302",
+    "type": "immediate",
+    "opportunity_count": 1,
+    "work_hours": true
+  },
+  {
+    "timestamp": "2025-06-17T12:13:58.980759",
+    "type": "immediate",
+    "opportunity_count": 1,
+    "work_hours": true
+  },
+  {
+    "timestamp": "2025-06-17T13:03:28.328166",
+    "type": "immediate",
+    "opportunity_count": 1,
+    "work_hours": true
+  },
+  {
+    "timestamp": "2025-06-17T13:19:03.879229",
+    "type": "immediate",
+    "opportunity_count": 1,
+    "work_hours": true
+  },
+  {
+    "timestamp": "2025-06-17T13:21:21.092251",
+    "type": "immediate",
+    "opportunity_count": 1,
+    "work_hours": true
+  },
+  {
+    "timestamp": "2025-06-17T13:23:54.731222",
+    "type": "immediate",
+    "opportunity_count": 1,
+    "work_hours": true
+  },
+  {
+    "timestamp": "2025-06-17T13:26:48.477094",
+    "type": "immediate",
+    "opportunity_count": 1,
+    "work_hours": true
+  },
+  {
+    "timestamp": "2025-06-17T13:31:25.149451",
+    "type": "immediate",
+    "opportunity_count": 1,
+    "work_hours": true
+  },
+  {
+    "timestamp": "2025-06-17T13:32:40.935459",
+    "type": "immediate",
+    "opportunity_count": 4,
+    "work_hours": true
+  },
+  {
+    "timestamp": "2025-06-17T13:42:18.289651",
+    "type": "immediate",
+    "opportunity_count": 1,
+    "work_hours": true
   }
 ]

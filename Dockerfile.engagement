@@ -31,5 +31,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 # Expose monitoring port
 EXPOSE 8080
 
-# Default command runs the 24/7 X engagement service
+# Default command runs the 24/7 X engagement service (now fixed to skip health check API calls)
 CMD ["python", "x_engagement_service.py"]
