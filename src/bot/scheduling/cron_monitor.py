@@ -548,6 +548,7 @@ class CronMonitorSystem:
                 return
             
             # Generate content using Claude API
+            # Build prompt without JSON template to avoid f-string formatting issues
             content_prompt = f"""
             Generate a strategic reply for this AI x blockchain opportunity:
             
@@ -569,21 +570,14 @@ class CronMonitorSystem:
             4. Stays under 280 characters
             5. Includes relevant AI x blockchain insights
             
-            Provide:
-            - Primary reply (280 chars max)
-            - Reasoning for the approach
-            - 2 alternative responses
-            - Engagement prediction (0-1)
-            - Voice alignment score (0-1)
+            Provide your response as JSON with these exact keys:
+            - primary_reply: Your main response (string, max 280 chars)
+            - reasoning: Why this approach works (string)
+            - alternatives: Array of 2 alternative responses
+            - engagement_prediction: Number from 0.0 to 1.0
+            - voice_alignment: Number from 0.0 to 1.0
             
-            Format as JSON:
-            {
-                "primary_reply": "Your main response",
-                "reasoning": "Why this approach works",
-                "alternatives": ["Alt 1", "Alt 2"],
-                "engagement_prediction": 0.75,
-                "voice_alignment": 0.85
-            }
+            Example format: JSON object with primary_reply, reasoning, alternatives array, engagement_prediction number, voice_alignment number
             """
             
             # Use Claude to generate content
