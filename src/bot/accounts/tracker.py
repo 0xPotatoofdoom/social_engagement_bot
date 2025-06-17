@@ -10,8 +10,9 @@ from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass, asdict
 from pathlib import Path
 import structlog
+from bot.utils.logging_config import get_strategic_accounts_logger
 
-logger = structlog.get_logger()
+logger = get_strategic_accounts_logger()
 
 @dataclass
 class AccountProfile:

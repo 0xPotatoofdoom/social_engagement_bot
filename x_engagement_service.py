@@ -29,19 +29,13 @@ from bot.api.claude_client import ClaudeAPIClient
 from bot.accounts.tracker import StrategicAccountTracker
 from bot.scheduling.cron_monitor import CronMonitorSystem, AlertConfiguration, AlertOpportunity
 
-# Configure logging
-log_dir = '/app/data/logs' if os.path.exists('/app/data') else './data/logs'
-os.makedirs(log_dir, exist_ok=True)
+# Import enhanced logging system
+from bot.utils.logging_config import setup_logging, get_component_logger
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.FileHandler(os.path.join(log_dir, 'monitoring.log')),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger(__name__)
+# Setup advanced logging with rotation
+log_dir = '/app/logs' if os.path.exists('/app') else './logs'
+logging_manager = setup_logging(log_dir)
+logger = get_component_logger("main_service")
 
 @dataclass
 class MetricsSnapshot:

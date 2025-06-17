@@ -22,6 +22,7 @@
 - **🏥 Health Monitoring**: Docker health checks, structured logging, real-time metrics
 - **🎯 Opportunity Scoring**: AI-powered relevance and priority detection
 - **🛡️ Duplicate Prevention**: Tracks processed opportunities to prevent repeated emails
+- **📊 Advanced Logging**: Component-specific logs with rotation and email event tracking
 
 ### 🎉 **FIRST DAY LIVE PERFORMANCE:**
 - **✅ 12 opportunities detected** in first 10-minute monitoring cycle
@@ -45,6 +46,13 @@ python run_tests.py coverage              # Run with coverage report
 python run_tests.py test_claude_api_integration.py    # Test Claude API
 python run_tests.py test_email_alert_system.py       # Test email alerts
 python run_tests.py test_production_monitoring.py    # Test monitoring system
+
+# 📊 ADVANCED LOGGING SYSTEM (NEW!)
+# Logs are automatically rotated on startup and stored in logs/
+# Component-specific logs: monitoring.log, x_api.log, claude_api.log, strategic_accounts.log
+# Email events: email_events.log (tracks delivery, bounces, errors)
+# Main application: x_engagement_bot.log
+# Archived logs: logs/archive/{timestamp}/ (keeps last 30 startup sessions)
 
 # 📧 EMAIL ALERT TESTING
 python send_email_report.py               # Send comprehensive report

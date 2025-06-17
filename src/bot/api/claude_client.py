@@ -15,8 +15,11 @@ import structlog
 import aiohttp
 from dataclasses import dataclass
 
+# Import enhanced logging
+from bot.utils.logging_config import get_claude_api_logger
+
 # Configure structured logging
-logger = structlog.get_logger(__name__)
+logger = get_claude_api_logger()
 
 
 @dataclass

@@ -15,8 +15,11 @@ from collections import defaultdict
 import structlog
 from dataclasses import dataclass, field
 
+# Import enhanced logging
+from bot.utils.logging_config import get_x_api_logger
+
 # Configure structured logging
-logger = structlog.get_logger(__name__)
+logger = get_x_api_logger()
 
 
 @dataclass

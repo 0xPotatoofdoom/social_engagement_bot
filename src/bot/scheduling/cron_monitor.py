@@ -15,7 +15,10 @@ from pathlib import Path
 import structlog
 import os
 
-logger = structlog.get_logger()
+# Import enhanced logging
+from bot.utils.logging_config import get_monitoring_logger, get_email_logger
+
+logger = get_monitoring_logger()
 
 @dataclass
 class AlertConfiguration:
@@ -90,6 +93,9 @@ class CronMonitorSystem:
         
         # Duplicate detection
         self.processed_opportunities: set = set()
+        
+        # Email event logger
+        self.email_logger = get_email_logger()
         
         self._load_alert_history()
         self._load_processed_opportunities()
@@ -756,7 +762,7 @@ class CronMonitorSystem:
                 "These opportunities require immediate attention (within 30 minutes) for maximum impact."
             )
             
-            await self._send_email(subject, html_content)
+            await self._send_email(subject, html_content, "immediate", len(opportunities))
             
             # Record alert
             self._record_alert('immediate', len(opportunities), opportunities)
@@ -777,7 +783,7 @@ class CronMonitorSystem:
                 "These opportunities are time-sensitive and should be addressed within 1-2 hours."
             )
             
-            await self._send_email(subject, html_content)
+            await self._send_email(subject, html_content, "priority", len(opportunities))
             
             # Record alert
             self._record_alert('priority', len(opportunities), opportunities)
@@ -941,8 +947,9 @@ class CronMonitorSystem:
         
         return html_template
     
-    async def _send_email(self, subject: str, html_content: str):
-        """Send email alert"""
+    async def _send_email(self, subject: str, html_content: str, alert_type: str = "unknown", opportunity_count: int = 0):
+        """Send email alert with enhanced logging"""
+        smtp_response = None
         try:
             msg = MIMEMultipart('alternative')
             msg['Subject'] = subject
@@ -955,12 +962,64 @@ class CronMonitorSystem:
             with smtplib.SMTP(self.config.smtp_server, self.config.smtp_port) as server:
                 server.starttls()
                 server.login(self.config.email_username, self.config.email_password)
-                server.send_message(msg)
+                response = server.send_message(msg)
+                smtp_response = str(response) if response else "250 OK"
             
-            logger.info(f"Email sent successfully: {subject}")
+            # Log successful email
+            self.email_logger.log_email_attempt(
+                to_email=self.config.to_email,
+                subject=subject,
+                alert_type=alert_type,
+                opportunity_count=opportunity_count,
+                success=True,
+                smtp_response=smtp_response
+            )
+            
+            logger.info(
+                "email_sent_successfully",
+                to_email=self.config.to_email,
+                subject_length=len(subject),
+                alert_type=alert_type,
+                opportunity_count=opportunity_count
+            )
+            
+        except smtplib.SMTPException as e:
+            error_msg = f"SMTP Error: {e}"
+            self.email_logger.log_email_attempt(
+                to_email=self.config.to_email,
+                subject=subject,
+                alert_type=alert_type,
+                opportunity_count=opportunity_count,
+                success=False,
+                error=error_msg
+            )
+            
+            logger.error(
+                "email_smtp_error",
+                error=error_msg,
+                to_email=self.config.to_email,
+                alert_type=alert_type
+            )
+            raise
             
         except Exception as e:
-            logger.error(f"Error sending email: {e}")
+            error_msg = f"General email error: {e}"
+            self.email_logger.log_email_attempt(
+                to_email=self.config.to_email,
+                subject=subject,
+                alert_type=alert_type,
+                opportunity_count=opportunity_count,
+                success=False,
+                error=error_msg
+            )
+            
+            logger.error(
+                "email_general_error",
+                error=error_msg,
+                to_email=self.config.to_email,
+                alert_type=alert_type
+            )
+            raise
     
     def _record_alert(self, alert_type: str, opportunity_count: int, opportunities: List[AlertOpportunity] = None):
         """Record alert in history with opportunity details"""
@@ -1021,7 +1080,7 @@ class CronMonitorSystem:
                 f"Summary of all AI x blockchain opportunities discovered today. {len(digest_opportunities)} opportunities above quality threshold."
             )
             
-            await self._send_email(subject, html_content)
+            await self._send_email(subject, html_content, "daily_digest", len(digest_opportunities))
             
             # Record digest
             self._record_alert('daily_digest', len(digest_opportunities), digest_opportunities)
