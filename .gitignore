@@ -41,14 +41,24 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
-# Environments
+# Environments (CRITICAL: Never commit these)
 .env
+.env.*
+!.env.template
 .venv
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+
+# API Keys and Secrets (CRITICAL SECURITY)
+*key*
+*secret*
+*token*
+*password*
+!*template*
+!*example*
 
 # IDEs
 .vscode/
