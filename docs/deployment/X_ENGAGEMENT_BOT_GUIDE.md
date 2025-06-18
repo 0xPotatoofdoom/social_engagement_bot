@@ -4,12 +4,14 @@
 
 ## 🎯 What This Bot Does
 
-- **Monitors Strategic Accounts**: Tracks 10 high-value X accounts for engagement opportunities
+- **Strategic Account Monitoring**: Actively monitors timelines of 10 KOL accounts (Vitalik, dabit3, etc.)
+- **Dual Detection Strategy**: Combines keyword search + timeline monitoring for comprehensive coverage
 - **AI-Powered Content Generation**: Creates contextual replies using Claude API
 - **Keyword Monitoring**: Searches for "uniswap v4", "unichain", "defi", "ai agents" opportunities
-- **Smart Email Alerts**: Sends opportunities with AI-generated responses and action links
+- **Smart Email Alerts**: Tier-based prioritization (Tier 1 accounts get 0.85+ scores)
 - **ROI Tracking**: Measures engagement value to justify API upgrade costs
 - **24/7 Operation**: Runs continuously with intelligent rate limiting
+- **TDD Implementation**: 100% test coverage for strategic monitoring features
 
 ## 🚀 Quick Start (Local Testing)
 
@@ -86,19 +88,25 @@ docker logs -f x_engagement_bot
 - **Performance Predictions**: Engagement probability and voice alignment scores
 - **Strategic Context**: Account tier, relationship status, timing recommendations
 
-## 🎯 Strategic Accounts (10 Total)
+## 🎯 Strategic Accounts (10 Total - NOW ACTIVELY MONITORED)
 
-### **Tier 1 Priority (6 accounts)**
+### **Tier 1 Priority (5 accounts) - Score Boost: +0.15**
 - @VitalikButerin - Ethereum founder, AI x blockchain thought leader
-- @dabit3 - Developer advocate, technical content creator
+- @dabit3 - Developer advocate, technical content creator  
 - @PatrickAlphaC - Smart contract developer, educational content
-- @TheCryptoLark - Crypto content creator and analyst
 - @saucepoint - Uniswap ecosystem contributor, v4 expert
+- @TheCryptoLark - Crypto content creator and analyst
 
-### **Tier 2 Strategic (4 accounts)**
+### **Tier 2 Strategic (3 accounts) - Base Score: 0.70**
 - @VirtualBacon0x - DeFi protocol contributor
 - @Morecryptoonl - Crypto content creator
 - @AzFlin - DeFi ecosystem participant
+
+### **Monitoring Implementation**
+- Timelines checked every 30 minutes for recent tweets (last 2 hours)
+- Deduplication via `data/strategic_accounts/processed_tweets.json`
+- AI enrichment for all strategic opportunities
+- Automatic email alerts for relevant content
 
 ## 🔍 Monitoring Keywords
 

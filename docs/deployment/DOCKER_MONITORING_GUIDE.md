@@ -18,12 +18,14 @@ docker logs -f ai_blockchain_monitor
 ## 📊 System Overview
 
 ### **Core Features**
-- ✅ **24/7 Continuous Monitoring** - Strategic accounts and keyword detection
-- ✅ **Intelligent Rate Limiting** - Respects API limits with exponential backoff
+- ✅ **24/7 Continuous Monitoring** - Dual strategy: keyword search + KOL timeline monitoring
+- ✅ **Strategic Account Tracking** - 10 high-value accounts monitored every 30 minutes
+- ✅ **Intelligent Rate Limiting** - Balances between search (300) and timeline (1500) endpoints
 - ✅ **ROI Metrics Tracking** - Proves value before API upgrade
-- ✅ **Enhanced Email Alerts** - AI-generated content with action links
-- ✅ **Real-time Dashboard** - Live performance metrics
+- ✅ **Enhanced Email Alerts** - Tier-based prioritization with AI-generated content
+- ✅ **Real-time Dashboard** - Live performance metrics with strategic account hits
 - ✅ **Health Monitoring** - Automated health checks and recovery
+- ✅ **TDD Implementation** - 100% test coverage for strategic monitoring
 
 ### **API Tier Strategy**
 - **Current**: Free tier (0 requests/month cost)

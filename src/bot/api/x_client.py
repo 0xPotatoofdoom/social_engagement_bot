@@ -612,6 +612,66 @@ class XAPIClient:
         
         return result
     
+    async def get_user_timeline(self, username: str, max_results: int = 10) -> List[Dict]:
+        """Get recent tweets from a user's timeline
+        
+        Args:
+            username: Twitter username (without @)
+            max_results: Number of tweets to fetch (max 100)
+            
+        Returns:
+            List of tweet dictionaries
+        """
+        logger.info(
+            "fetching_user_timeline",
+            username=username,
+            max_results=max_results
+        )
+        
+        try:
+            # First get user ID from username
+            user = self.client.get_user(username=username)
+            if not user or not user.data:
+                logger.error(f"User not found: {username}")
+                return []
+                
+            user_id = user.data.id
+            
+            # Fetch user timeline
+            tweets = self.client.get_users_tweets(
+                id=user_id,
+                max_results=min(max_results, 100),
+                tweet_fields=['created_at', 'public_metrics', 'author_id'],
+                exclude=['retweets', 'replies']
+            )
+            
+            if not tweets or not tweets.data:
+                logger.info(f"No tweets found for {username}")
+                return []
+                
+            # Format tweets
+            formatted_tweets = []
+            for tweet in tweets.data:
+                formatted_tweets.append({
+                    'id': tweet.id,
+                    'text': tweet.text,
+                    'created_at': tweet.created_at.isoformat() if hasattr(tweet.created_at, 'isoformat') else str(tweet.created_at),
+                    'user': {
+                        'screen_name': username,
+                        'id': user_id
+                    },
+                    'retweet_count': tweet.public_metrics.get('retweet_count', 0),
+                    'favorite_count': tweet.public_metrics.get('like_count', 0),
+                    'reply_count': tweet.public_metrics.get('reply_count', 0)
+                })
+                
+            logger.info(f"Retrieved {len(formatted_tweets)} tweets from {username}")
+            return formatted_tweets
+            
+        except Exception as e:
+            logger.error(f"Error fetching timeline for {username}: {e}")
+            return []
+
     async def post_tweet_with_retry(self, text: str, max_retries: int = 3) -> Dict:
         """Post tweet with retry logic and exponential backoff."""
         logger.info(

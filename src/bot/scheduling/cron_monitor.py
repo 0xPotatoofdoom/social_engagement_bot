@@ -1600,20 +1600,31 @@ class CronMonitorSystem:
         self.monitoring_active = False
     
     def _get_focused_keywords(self) -> List[str]:
-        """Get focused keywords for Uniswap v4/Unichain/AI intersection."""
+        """Get focused keywords for Uniswap v4/Unichain/AI intersection - prioritizing technical discussions."""
         return [
-            # Specific v4/Unichain technical terms (higher quality)
-            "uniswap v4 hooks",
-            "unichain ai agents", 
-            "v4 concentrated liquidity",
-            "unichain autonomous trading",
-            "v4 mev protection",
-            "unichain smart routing",
-            # Remove generic "ai-powered routing" that catches shills
-            "v4 hook architecture",
-            "unichain machine learning",
-            "autonomous v4 strategies",
-            "unichain protocol design"
+            # Technical implementation discussions
+            "v4 hooks implementation",
+            "building on unichain",
+            "v4 hook examples",
+            "unichain development",
+            
+            # Specific technical questions/discussions
+            "how do v4 hooks work",
+            "unichain architecture",
+            "v4 liquidity management",
+            "implementing v4 strategies",
+            
+            # Advanced technical concepts
+            "v4 custom amm curves",
+            "unichain tee validation",
+            "v4 dynamic fees",
+            "unichain block building",
+            
+            # Developer-focused terms
+            "v4 hook tutorial",
+            "unichain sdk",
+            "v4 solidity patterns",
+            "debugging v4 hooks"
         ]
     
     async def _generate_original_content(self, content_type: str = "trending_topic") -> Dict:

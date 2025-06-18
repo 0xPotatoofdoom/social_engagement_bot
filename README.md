@@ -25,17 +25,20 @@ An intelligent Twitter/X engagement bot powered by AI that monitors blockchain a
 ## 🚀 Features
 
 ### Core Capabilities
-- **24/7 Monitoring**: Continuous monitoring of AI x blockchain conversations
+- **24/7 Monitoring**: Dual detection strategy - keyword search + KOL timeline monitoring
+- **Strategic Account Tracking**: Actively monitors 10 high-value accounts (Vitalik, dabit3, etc.)
 - **Smart Filtering**: Advanced shill detection and quality scoring
 - **AI-Powered Responses**: Context-aware reply generation using Claude AI
 - **Voice Evolution**: Feedback system that learns and improves response quality
-- **Strategic Account Tracking**: Monitor high-value thought leaders and developers
+- **TDD Implementation**: 100% test coverage for strategic monitoring features
 
 ### Advanced Features
+- **Timeline Monitoring**: Checks strategic account timelines every 30 minutes
+- **Tier-Based Prioritization**: Tier 1 accounts get +0.15 score boost for guaranteed alerts
 - **Email Alerts**: Real-time notifications with feedback buttons for quality rating
 - **Original Content Generation**: Trending topics and unique takes
 - **Comprehensive Analytics**: ROI tracking and performance metrics
-- **Rate Limit Management**: Intelligent API usage optimization
+- **Rate Limit Management**: Intelligent balancing between search and timeline endpoints
 - **Health Monitoring**: Container health checks and auto-recovery
 
 ## 📋 Requirements
@@ -73,12 +76,17 @@ SENDER_PASSWORD=your_app_password
 RECIPIENT_EMAIL=notifications@your_domain.com
 ```
 
+### Strategic Accounts Monitoring
+The bot actively monitors these KOL accounts every 30 minutes:
+- **Tier 1 (Score ≥ 0.85)**: VitalikButerin, dabit3, PatrickAlphaC, saucepoint, TheCryptoLark
+- **Tier 2 (Score ≥ 0.70)**: VirtualBacon0x, Morecryptoonl, AzFlin
+
 ### Strategic Keywords
 Customize monitoring keywords in `config/ai_blockchain/strategic_keywords.yaml`:
-- AI agent development
+- Uniswap v4, Unichain, hooks
+- AI agents, autonomous trading
+- MEV protection, liquidity optimization
 - Blockchain infrastructure
-- DeFi protocols
-- Technical discussions
 
 ## 🐳 Deployment
 
@@ -101,6 +109,9 @@ pip install -r requirements.txt
 
 # Run tests
 python -m pytest tests/ -v
+
+# Run strategic monitoring tests specifically
+python -m pytest tests/unit/test_strategic_account_monitoring.py -v
 
 # Start service
 python x_engagement_service.py

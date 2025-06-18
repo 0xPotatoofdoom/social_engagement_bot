@@ -29,6 +29,7 @@ from bot.api.claude_client import ClaudeAPIClient
 from bot.accounts.tracker import StrategicAccountTracker
 from bot.scheduling.cron_monitor import CronMonitorSystem, AlertConfiguration, AlertOpportunity
 from bot.web.feedback_server import start_feedback_server
+from bot.monitoring.strategic_account_monitor import StrategicAccountMonitor
 
 # Import enhanced logging system
 from bot.utils.logging_config import setup_logging, get_component_logger
@@ -387,6 +388,7 @@ class XEngagementService:
         self.claude_client = None
         self.strategic_tracker = None
         self.monitor = None
+        self.strategic_monitor = None
         
         # Monitoring configuration
         self.monitoring_interval = 30 * 60  # 30 minutes
@@ -437,8 +439,12 @@ class XEngagementService:
                 config=email_config
             )
             
+            # Strategic Account Monitor
+            self.strategic_monitor = StrategicAccountMonitor()
+            logger.info(f"Loaded {len(self.strategic_monitor.get_strategic_accounts()['tier_1']) + len(self.strategic_monitor.get_strategic_accounts()['tier_2'])} strategic accounts")
+            
             # SKIP API health check to avoid rate limits - just check object creation
-            if self.x_client and self.claude_client and self.monitor:
+            if self.x_client and self.claude_client and self.monitor and self.strategic_monitor:
                 logger.info("✅ All clients initialized successfully (health check skipped)")
                 return True
             else:
@@ -532,6 +538,26 @@ class XEngagementService:
             else:
                 logger.info("Skipping keyword search - rate limited")
             
+            # Monitor strategic accounts if rate limits allow
+            if can_timeline:
+                try:
+                    logger.info("Checking strategic accounts...")
+                    strategic_opportunities = await self.monitor_strategic_accounts()
+                    if strategic_opportunities:
+                        all_opportunities.extend(strategic_opportunities)
+                        logger.info(f"Found {len(strategic_opportunities)} strategic opportunities")
+                        
+                        for opp in strategic_opportunities:
+                            self.metrics.record_opportunity(opp)
+                            
+                except Exception as e:
+                    if "rate limit" in str(e).lower():
+                        self.rate_manager.handle_rate_limit('user_timeline')
+                        self.metrics.record_rate_limit_hit()
+                        logger.warning(f"Strategic monitoring hit rate limit: {e}")
+                    else:
+                        logger.warning(f"Strategic monitoring error: {e}")
+            
             # Send alerts using NEW CONCISE SYSTEM ONLY
             if all_opportunities:
                 try:
@@ -574,6 +600,61 @@ class XEngagementService:
             
         except Exception as e:
             logger.error(f"Daily report error: {e}")
+    
+    async def monitor_strategic_accounts(self) -> List[AlertOpportunity]:
+        """Monitor strategic KOL accounts for opportunities"""
+        try:
+            # Use the strategic monitor to check accounts
+            raw_opportunities = await asyncio.to_thread(
+                self.strategic_monitor.check_strategic_accounts,
+                self.x_client,
+                self.rate_manager
+            )
+            
+            if not raw_opportunities:
+                return []
+            
+            # Convert to AlertOpportunity objects
+            alert_opportunities = []
+            for opp in raw_opportunities:
+                # Enrich with AI content
+                enriched = await asyncio.to_thread(
+                    self.strategic_monitor.enrich_opportunity_with_ai,
+                    opp,
+                    self.claude_client
+                )
+                
+                # Create AlertOpportunity
+                alert_opp = AlertOpportunity(
+                    account_username=enriched['account'],
+                    account_tier=enriched.get('tier', 2),
+                    content_text=enriched['text'],
+                    content_url=f"https://x.com/{enriched['account']}/status/{enriched['tweet_id']}",
+                    timestamp=enriched['created_at'],
+                    overall_score=enriched['relevance_score'],
+                    ai_blockchain_relevance=enriched['relevance_score'],
+                    technical_depth=0.8,  # High for strategic accounts
+                    opportunity_type="strategic_account",
+                    suggested_response_type="technical_insight",
+                    time_sensitivity="high",
+                    strategic_context=f"Strategic Tier {enriched.get('tier', 2)} Account",
+                    suggested_response=enriched.get('ai_content', {}).get('primary', ''),
+                    generated_reply=enriched.get('ai_content', {}).get('primary', ''),
+                    reply_reasoning="High-value strategic account engagement",
+                    alternative_responses=[
+                        enriched.get('ai_content', {}).get('alt1', ''),
+                        enriched.get('ai_content', {}).get('alt2', '')
+                    ],
+                    confidence_score=enriched.get('ai_content', {}).get('confidence', 0.9),
+                    voice_alignment_score=enriched.get('ai_content', {}).get('voice_alignment', 0.85)
+                )
+                alert_opportunities.append(alert_opp)
+                
+            return alert_opportunities
+            
+        except Exception as e:
+            logger.error(f"Strategic account monitoring error: {e}")
+            return []
     
     async def run(self):
         """Main monitoring loop"""
@@ -631,6 +712,15 @@ class XEngagementService:
     def stop(self):
         """Stop the monitoring service"""
         self.running = False
+    
+    def run_monitoring_cycle(self):
+        """Synchronous wrapper for monitoring cycle (for tests)"""
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            loop.run_until_complete(self.monitoring_cycle())
+        finally:
+            loop.close()
 
 # Global service instance
 service = XEngagementService()

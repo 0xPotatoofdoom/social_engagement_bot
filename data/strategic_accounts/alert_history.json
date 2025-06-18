@@ -686,5 +686,145 @@
         "type": "technical_discussion|breakthrough_announcement|collaboration"
       }
     ]
+  },
+  {
+    "timestamp": "2025-06-17T19:36:50.002854",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": false,
+    "opportunity_ids": [
+      "b652410b_20250617_19"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "SYSTEM_STARTUP",
+        "score": 0.85,
+        "type": "system_startup_verification"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-17T19:37:35.337952",
+    "type": "detailed_with_trending_topic",
+    "opportunity_count": 2,
+    "work_hours": false,
+    "opportunity_ids": [
+      "keyword_search_uniswap_v4_hooks_1935047068441284870",
+      "keyword_search_v4_hook_architecture_1935041859673293043"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "keyword_search_uniswap_v4_hooks",
+        "score": 0.8550000000000001,
+        "type": "technical_discussion|breakthrough_announcement"
+      },
+      {
+        "account": "keyword_search_v4_hook_architecture",
+        "score": 0.8250000000000001,
+        "type": "technical_discussion|breakthrough_announcement"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-18T04:44:32.401436",
+    "type": "detailed_with_trending_topic",
+    "opportunity_count": 2,
+    "work_hours": false,
+    "opportunity_ids": [
+      "keyword_search_uniswap_v4_hooks_1935255657101541692",
+      "keyword_search_uniswap_v4_hooks_1935255614768431410"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "keyword_search_uniswap_v4_hooks",
+        "score": 0.8300000000000001,
+        "type": "technical_discussion"
+      },
+      {
+        "account": "keyword_search_uniswap_v4_hooks",
+        "score": 0.8300000000000001,
+        "type": "technical_discussion"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-18T05:15:18.341955",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": false,
+    "opportunity_ids": [
+      "keyword_search_uniswap_v4_hooks_1935258689696579901"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "keyword_search_uniswap_v4_hooks",
+        "score": 0.8300000000000001,
+        "type": "breakthrough_announcement"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-18T07:17:46.579792",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": false,
+    "opportunity_ids": [
+      "keyword_search_uniswap_v4_hooks_1935292584034750960"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "keyword_search_uniswap_v4_hooks",
+        "score": 0.7500000000000001,
+        "type": "technical_discussion,breakthrough_announcement"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-18T08:49:57.820139",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": false,
+    "opportunity_ids": [
+      "keyword_search_uniswap_v4_hooks_1935311451272675821"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "keyword_search_uniswap_v4_hooks",
+        "score": 0.7500000000000001,
+        "type": "technical_discussion"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-18T10:57:24.579162",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": true,
+    "opportunity_ids": [
+      "b652410b_20250618_10"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "SYSTEM_STARTUP",
+        "score": 0.85,
+        "type": "system_startup_verification"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-18T12:29:37.582053",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": true,
+    "opportunity_ids": [
+      "keyword_search_uniswap_v4_hooks_1935373066856456469"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "keyword_search_uniswap_v4_hooks",
+        "score": 0.85,
+        "type": "technical_discussion|breakthrough_announcement"
+      }
+    ]
   }
 ]

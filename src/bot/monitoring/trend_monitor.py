@@ -472,13 +472,17 @@ class TrendMonitor:
                 # Determine response approach
                 suggested_approach = await self.suggest_keyword_response_approach(keyword, tweet)
                 
-                # Enhanced filtering: Higher thresholds + shill detection + v4/Unichain focus
+                # Enhanced filtering: Higher thresholds + shill detection + bot detection + v4/Unichain focus
                 is_shill = await self._detect_shill_content(tweet_text)
+                is_bot = await self._detect_bot_content(tweet)  # NEW: Bot detection
                 has_v4_unichain_relevance = await self._check_v4_unichain_relevance(tweet_text, keyword)
+                is_quality_discussion = await self._is_quality_human_discussion(tweet)  # NEW: Quality check
                 
-                # Much stricter thresholds to avoid low-quality opportunities
-                if (relevance_score > 0.7 and sentiment_score > 0.5 and engagement_potential > 0.6 
-                    and not is_shill and has_v4_unichain_relevance):
+                # Much stricter thresholds to avoid low-quality opportunities and bots
+                # Prioritize quality human discussions or very high relevance scores
+                if ((relevance_score > 0.7 and sentiment_score > 0.5 and engagement_potential > 0.6 
+                    and not is_shill and not is_bot and has_v4_unichain_relevance)
+                    and (is_quality_discussion or relevance_score > 0.85)):
                     opportunity = ContentOpportunity(
                         trigger_type='keyword_search',
                         context={
@@ -644,6 +648,137 @@ class TrendMonitor:
             
         return False
     
+    async def _detect_bot_content(self, tweet: Dict) -> bool:
+        """Detect bot-generated content patterns and automated accounts."""
+        text = tweet.get('text', '').lower()
+        
+        # Bot content patterns
+        bot_indicators = [
+            # Repetitive announcement templates
+            r'breaking:\s+\w+\s+just',
+            r'alert:\s+\w+\s+(launched|announced|released)',
+            r'new:\s+\w+\s+(protocol|platform|dapp)',
+            r'🚨\s*breaking',
+            r'📢\s*announcement',
+            
+            # Generic excitement patterns (common in bots)
+            r'excited to (announce|share|introduce|launch)',
+            r'thrilled to (announce|share|introduce|launch)',
+            r'proud to (announce|share|introduce|launch)',
+            r'delighted to (announce|share|introduce|launch)',
+            
+            # Automated call-to-action patterns
+            'don\'t miss out',
+            'limited time',
+            'act now',
+            'join us today',
+            'sign up now',
+            'register today',
+            'claim your spot',
+            
+            # Bot-like ending phrases
+            'stay tuned for more updates',
+            'follow us for the latest',
+            'like and retweet',
+            'share with your network',
+            'tag your friends',
+            
+            # Generic protocol descriptions
+            r'revolutionary (protocol|platform|solution)',
+            r'game-changing (protocol|platform|solution)',
+            r'next-gen(eration)? (protocol|platform|solution)',
+            r'cutting-edge (protocol|platform|solution)',
+            
+            # Automated metrics boasting
+            r'\d+%\s*(apy|apr|yield|returns)',
+            r'\$\d+[kmb]?\s*(tvl|volume|liquidity)',
+            r'over\s+\d+\s+users',
+            r'trusted by\s+\d+',
+        ]
+        
+        # Count bot pattern matches
+        import re
+        pattern_matches = 0
+        for pattern in bot_indicators:
+            if isinstance(pattern, str):
+                if pattern in text:
+                    pattern_matches += 1
+            else:
+                if re.search(pattern, text):
+                    pattern_matches += 1
+        
+        # Check for excessive formatting (bot characteristic)
+        emoji_patterns = ['🚀', '🔥', '💎', '🌟', '⚡', '💰', '🏆', '✨']
+        emoji_count = sum(text.count(emoji) for emoji in emoji_patterns)
+        
+        # Check text structure for bot-like consistency
+        sentences = [s.strip() for s in text.split('.') if s.strip()]
+        if len(sentences) >= 3:
+            # Bots often have very consistent sentence lengths
+            lengths = [len(s) for s in sentences]
+            avg_length = sum(lengths) / len(lengths)
+            length_variance = sum((l - avg_length) ** 2 for l in lengths) / len(lengths)
+            if length_variance < 100:  # Very low variance suggests templated content
+                pattern_matches += 1
+        
+        # Check for multiple hashtags (bot characteristic)
+        hashtag_count = text.count('#')
+        if hashtag_count > 4:
+            pattern_matches += 1
+        
+        # Check for multiple links (bot characteristic)
+        link_count = text.count('http://') + text.count('https://') + text.count('t.co/')
+        if link_count > 2:
+            pattern_matches += 1
+        
+        # Account-level bot indicators (if we have the data)
+        author_metrics = tweet.get('author', {}).get('public_metrics', {})
+        if author_metrics:
+            followers = author_metrics.get('followers_count', 0)
+            following = author_metrics.get('following_count', 0)
+            tweets = author_metrics.get('tweet_count', 0)
+            
+            # Bot account patterns
+            if followers < 100 and tweets > 1000:  # High activity, low followers
+                pattern_matches += 1
+            if following > followers * 10 and followers < 1000:  # Following way more than followers
+                pattern_matches += 1
+            if followers > 0 and following > 0:
+                ratio = following / followers
+                if ratio > 50:  # Extreme following ratio
+                    pattern_matches += 2
+        
+        # Check account creation date if available
+        created_at = tweet.get('author', {}).get('created_at', '')
+        if created_at:
+            try:
+                from datetime import datetime
+                account_age_days = (datetime.now() - datetime.fromisoformat(created_at.replace('Z', '+00:00'))).days
+                if account_age_days < 30 and tweet.get('author', {}).get('public_metrics', {}).get('tweet_count', 0) > 500:
+                    # New account with high activity - likely bot
+                    pattern_matches += 2
+            except:
+                pass
+        
+        # Determine if it's a bot
+        is_bot = (
+            pattern_matches >= 3 or  # Multiple bot patterns
+            emoji_count >= 8 or      # Excessive emojis
+            (pattern_matches >= 2 and emoji_count >= 5)  # Combination
+        )
+        
+        if is_bot:
+            logger.info(
+                "bot_content_detected",
+                tweet_id=tweet.get('id', 'unknown'),
+                pattern_matches=pattern_matches,
+                emoji_count=emoji_count,
+                hashtag_count=hashtag_count,
+                text_preview=text[:100]
+            )
+        
+        return is_bot
+    
     async def _check_v4_unichain_relevance(self, text: str, keyword: str) -> bool:
         """Check if content has genuine v4/Unichain technical relevance."""
         text_lower = text.lower()
@@ -674,6 +809,85 @@ class TrendMonitor:
         
         # For specific v4/Unichain keywords, just need core terms + some technical context
         return has_core_terms or has_technical_depth
+    
+    async def _is_quality_human_discussion(self, tweet: Dict) -> bool:
+        """Identify high-quality human discussions worth engaging with."""
+        text = tweet.get('text', '')
+        
+        # Positive indicators of human discussion
+        human_indicators = [
+            # Questions and curiosity
+            r'\?(?!\?)(?!\s*$)',  # Real questions (not just "???" or trailing ?)
+            r'(what|how|why|when|where|who)\s+\w+',  # Question words
+            r'(anyone|someone|anybody|somebody)\s+(know|think|tried|using)',
+            r'thoughts on',
+            r'opinions on',
+            r'curious about',
+            r'wondering if',
+            
+            # Technical discussion markers
+            r'(tried|tested|built|deployed|implemented)',
+            r'(works|working|worked)\s+(with|on)',
+            r'experience with',
+            r'lessons learned',
+            r'best practices',
+            r'pros and cons',
+            
+            # Personal experiences
+            r"(i've|we've|i have|we have)\s+(been|tried|built|used)",
+            r'in my experience',
+            r'found that',
+            r'discovered that',
+            r'learned that',
+            
+            # Thoughtful analysis
+            r'interesting (point|aspect|approach)',
+            r'worth noting',
+            r'important to (note|mention|consider)',
+            r'key (insight|takeaway|point)',
+            
+            # Community engagement
+            r'thanks for',
+            r'great point',
+            r'good question',
+            r'agree with',
+            r'disagree with',
+        ]
+        
+        # Count human discussion indicators
+        import re
+        human_score = 0
+        for pattern in human_indicators:
+            if re.search(pattern, text.lower()):
+                human_score += 1
+        
+        # Check for conversation markers
+        is_reply = tweet.get('referenced_tweets', [])
+        if is_reply and any(ref.get('type') == 'replied_to' for ref in is_reply):
+            human_score += 1  # Part of a conversation
+        
+        # Check for mentions (engaging with others)
+        mentions = tweet.get('entities', {}).get('mentions', [])
+        if 1 <= len(mentions) <= 3:  # Some mentions but not spam
+            human_score += 1
+        
+        # Length check - very short or very long tweets are often low quality
+        text_length = len(text)
+        if 50 < text_length < 500:  # Reasonable discussion length
+            human_score += 1
+        
+        # Check author engagement history
+        author_metrics = tweet.get('author', {}).get('public_metrics', {})
+        if author_metrics:
+            followers = author_metrics.get('followers_count', 0)
+            tweets = author_metrics.get('tweet_count', 0)
+            
+            # Established accounts with reasonable activity
+            if 100 < followers < 50000 and 500 < tweets < 20000:
+                human_score += 1
+        
+        # Higher score indicates more human-like quality discussion
+        return human_score >= 3
     
     async def check_trending_topics(self) -> List[TrendingTopic]:
         """Monitor trending topics relevant to our interests."""
