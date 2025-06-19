@@ -8,11 +8,10 @@ import json
 import os
 import time
 import signal
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional
+from datetime import datetime
+from typing import Dict
 from pathlib import Path
 from dataclasses import dataclass, asdict
-import logging
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import threading
 import sys
@@ -28,8 +27,6 @@ from bot.api.x_client import XAPIClient
 from bot.api.claude_client import ClaudeAPIClient
 from bot.accounts.tracker import StrategicAccountTracker
 from bot.scheduling.cron_monitor import CronMonitorSystem, AlertConfiguration, AlertOpportunity
-from bot.web.feedback_server import start_feedback_server
-from bot.monitoring.strategic_account_monitor import StrategicAccountMonitor
 
 # Import enhanced logging system
 from bot.utils.logging_config import setup_logging, get_component_logger
@@ -278,6 +275,18 @@ class HealthHandler(BaseHTTPRequestHandler):
             self.send_response(404)
             self.end_headers()
     
+    def do_POST(self):
+        from urllib.parse import urlparse, parse_qs
+        parsed_url = urlparse(self.path)
+        path_parts = parsed_url.path.strip('/').split('/')
+        
+        if len(path_parts) >= 3 and path_parts[0] == 'feedback' and path_parts[2] == 'improvement':
+            # Handle improvement suggestions: POST /feedback/{opportunity_id}/improvement
+            self._handle_improvement_suggestion(path_parts[1])
+        else:
+            self.send_response(404)
+            self.end_headers()
+    
     def _handle_feedback(self, opportunity_id: str, feedback_type: str, value: str):
         """Handle feedback endpoints"""
         try:
@@ -322,8 +331,50 @@ class HealthHandler(BaseHTTPRequestHandler):
             logger.error(f"Feedback handling error: {e}")
             self._send_error_page(f"Internal error: {e}")
     
+    def _handle_improvement_suggestion(self, opportunity_id: str):
+        """Handle improvement suggestion submissions"""
+        try:
+            # Parse the POST data
+            content_length = int(self.headers.get('Content-Length', 0))
+            post_data = self.rfile.read(content_length).decode('utf-8')
+            
+            from urllib.parse import parse_qs
+            parsed_data = parse_qs(post_data)
+            
+            improvement_text = parsed_data.get('improvement', [''])[0].strip()
+            
+            if improvement_text:
+                from bot.analytics.feedback_tracker import get_feedback_tracker
+                feedback_tracker = get_feedback_tracker()
+                
+                # Record the improvement suggestion
+                success = feedback_tracker.record_improvement_suggestion(
+                    opportunity_id, 
+                    improvement_text, 
+                    "User improvement suggestion via feedback form"
+                )
+                
+                if success:
+                    self._send_improvement_success_page(opportunity_id, improvement_text)
+                else:
+                    self._send_error_page("Failed to save improvement suggestion")
+            else:
+                self._send_error_page("No improvement suggestion provided")
+                
+        except Exception as e:
+            logger.error(f"Improvement suggestion handling error: {e}")
+            self._send_error_page(f"Internal error: {e}")
+    
     def _send_success_page(self, message: str):
-        """Send success feedback page"""
+        """Send success feedback page with improvement suggestion form"""
+        # Extract opportunity ID from the message if possible
+        opportunity_id = "unknown"
+        if "opportunity" in message.lower():
+            import re
+            match = re.search(r'opportunity (\w+)', message)
+            if match:
+                opportunity_id = match.group(1)
+        
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
@@ -332,8 +383,16 @@ class HealthHandler(BaseHTTPRequestHandler):
         <!DOCTYPE html>
         <html>
         <head><title>Feedback Recorded</title><style>
-        body {{ font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }}
-        .success {{ background: #d4edda; color: #155724; padding: 20px; border-radius: 8px; }}
+        body {{ font-family: Arial, sans-serif; max-width: 700px; margin: 50px auto; padding: 20px; }}
+        .success {{ background: #d4edda; color: #155724; padding: 20px; border-radius: 8px; margin-bottom: 20px; }}
+        .improvement-form {{ background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #007bff; }}
+        .form-group {{ margin: 15px 0; }}
+        label {{ display: block; font-weight: bold; margin-bottom: 5px; color: #495057; }}
+        textarea {{ width: 100%; min-height: 100px; padding: 10px; border: 1px solid #ced4da; border-radius: 4px; font-family: Arial, sans-serif; resize: vertical; }}
+        .btn {{ background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }}
+        .btn:hover {{ background: #0056b3; }}
+        .btn-secondary {{ background: #6c757d; margin-left: 10px; }}
+        .btn-secondary:hover {{ background: #545b62; }}
         </style></head>
         <body>
         <h1>🎯 X Engagement Bot Feedback</h1>
@@ -342,7 +401,75 @@ class HealthHandler(BaseHTTPRequestHandler):
         <p>{message}</p>
         <p>Thank you for helping improve the voice evolution system!</p>
         </div>
-        <button onclick="window.close()">Close Window</button>
+        
+        <div class="improvement-form">
+        <h3>💡 Help Improve Content Generation</h3>
+        <p>Got specific ideas on how this content could be better? Your suggestions help fine-tune the sprotogremlin voice!</p>
+        
+        <form method="POST" action="/feedback/{opportunity_id}/improvement">
+            <div class="form-group">
+                <label for="improvement">Improvement Suggestions:</label>
+                <textarea 
+                    id="improvement" 
+                    name="improvement" 
+                    placeholder="Example: 'Make it more technical', 'Add more dad energy', 'Less formal, more degen', 'Needs more crypto slang', etc..."
+                    maxlength="1000"
+                ></textarea>
+                <small style="color: #6c757d;">Max 1000 characters. Be specific about voice, tone, technical depth, etc.</small>
+            </div>
+            
+            <button type="submit" class="btn">💾 Submit Suggestion</button>
+            <button type="button" class="btn btn-secondary" onclick="window.close()">❌ Skip & Close</button>
+        </form>
+        </div>
+        </body></html>
+        """
+        self.wfile.write(html.encode())
+    
+    def _send_improvement_success_page(self, opportunity_id: str, improvement_text: str):
+        """Send success page for improvement suggestion submission"""
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        
+        html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head><title>Improvement Suggestion Recorded</title><style>
+        body {{ font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }}
+        .success {{ background: #d4edda; color: #155724; padding: 20px; border-radius: 8px; margin-bottom: 20px; }}
+        .suggestion-preview {{ background: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 4px solid #007bff; margin: 15px 0; }}
+        .btn {{ background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; text-decoration: none; display: inline-block; }}
+        </style></head>
+        <body>
+        <h1>🎯 X Engagement Bot Feedback</h1>
+        
+        <div class="success">
+        <h3>💡 Improvement Suggestion Saved!</h3>
+        <p>Your suggestion for opportunity <strong>{opportunity_id}</strong> has been recorded and will be used to fine-tune future content generation.</p>
+        </div>
+        
+        <div class="suggestion-preview">
+        <h4>Your Suggestion:</h4>
+        <p>"{improvement_text}"</p>
+        </div>
+        
+        <p><strong>What happens next?</strong></p>
+        <ul>
+        <li>✅ Your feedback is stored with the opportunity data</li>
+        <li>🧠 The AI will learn from this input for future content</li>
+        <li>🎯 Patterns in suggestions help evolve the sprotogremlin voice</li>
+        <li>📊 Combined with quality ratings to improve generation prompts</li>
+        </ul>
+        
+        <p style="text-align: center; margin-top: 30px;">
+        <button onclick="window.close()" class="btn">✅ Close Window</button>
+        </p>
+        
+        <p style="font-size: 12px; color: #6c757d; text-align: center; margin-top: 20px;">
+        Thank you for helping improve the voice evolution system!<br>
+        Your input is valuable for creating more authentic sprotogremlin content.
+        </p>
         </body></html>
         """
         self.wfile.write(html.encode())

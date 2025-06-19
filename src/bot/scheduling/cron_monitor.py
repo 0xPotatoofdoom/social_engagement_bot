@@ -21,6 +21,9 @@ from bot.utils.logging_config import get_monitoring_logger, get_email_logger
 from bot.analytics.feedback_tracker import get_feedback_tracker
 from bot.monitoring.keyword_rotator import get_keyword_rotator
 
+# Version tracking for email alerts
+SYSTEM_VERSION = "v2.1-sprotogremlin"  # Feature branch: authentic voice improvements
+
 logger = get_monitoring_logger()
 
 @dataclass
@@ -682,22 +685,22 @@ class CronMonitorSystem:
             Opportunity Type: {opportunity.opportunity_type}
             Suggested Approach: {opportunity.suggested_response_type}
             
-            Voice Guidelines:
-            - AI x blockchain technical authority with relaxed, crypto-native vibe
-            - Conversational and approachable - use "chat" when addressing readers
-            - Forward-thinking innovation expert with authentic edge
-            - Educational but confident - no academic fluff or rigid formality
-            - NEVER use hashtags - they're not part of this voice
-            - Always use lowercase "v4" when referring to Uniswap v4
-            - Use specific terms: "Uniswap community/ecosystem/foundation/labs" not just "Uniswap"
+            Voice Guidelines - SingleDivorcedDad Sprotogremlin:
+            - 42-year-old single dad with sprotogremlin energy
+            - Chaotic but knowledgeable - crypto expertise expressed casually
+            - Dad wisdom mixed with degen gremlin vibes
+            - Technical knowledge but not corporate or formal
+            - Slightly unhinged but endearing energy
+            - NO buzzwords, NO "alpha", NO press release language
+            - NEVER use hashtags or emojis
             
             Generate a reply that:
-            1. Demonstrates technical expertise in AI x blockchain convergence
-            2. Adds unique value to the conversation  
-            3. Positions as thought leader in the space
+            1. Sounds like a real person, not a crypto influencer
+            2. Adds genuine insight but in gremlin language
+            3. Shows technical knowledge casually, not formally
             4. Stays under 280 characters
-            5. Uses crypto-native language with relaxed, approachable tone
-            6. NO HASHTAGS - clean text only
+            5. Has authentic dad/gremlin personality
+            6. NO corporate speak or marketing language
             
             Provide your response as JSON with these exact keys:
             - primary_reply: Your main response (string, max 280 chars)
@@ -841,11 +844,13 @@ class CronMonitorSystem:
             opp_count = len(opportunities)
             content_type = original_content.get('content_type', 'unknown')
             
-            # Generate subject based on content
+            # Generate subject based on content with version
             if opp_count == 0:
-                subject = f"🚀 Original {content_type.replace('_', ' ').title()} + AI x Blockchain Focus"
+                subject = f"🚀 Original {content_type.replace('_', ' ').title()} + AI x Blockchain Focus [{SYSTEM_VERSION}]"
+            elif any(opp.account_username == "SYSTEM_STARTUP" for opp in opportunities):
+                subject = f"🤖 SYSTEM STARTUP - SingleDivorcedDad Bot Online [{SYSTEM_VERSION}]"
             else:
-                subject = f"🎯 {opp_count} AI x Blockchain Opportunities + {content_type.replace('_', ' ').title()}"
+                subject = f"🎯 {opp_count} AI x Blockchain Opportunities + {content_type.replace('_', ' ').title()} [{SYSTEM_VERSION}]"
             
             html_content = self._generate_detailed_alert_with_original_html(opportunities, original_content)
             
@@ -863,7 +868,7 @@ class CronMonitorSystem:
     async def _send_detailed_alert(self, opportunities: List[AlertOpportunity]):
         """Send detailed email alert with comprehensive feedback tracking (legacy method)"""
         try:
-            subject = f"🎯 {len(opportunities)} AI x Blockchain Opportunities with Feedback Tracking"
+            subject = f"🎯 {len(opportunities)} AI x Blockchain Opportunities with Feedback Tracking [{SYSTEM_VERSION}]"
             
             html_content = self._generate_alert_html(
                 "PRIORITY OPPORTUNITIES WITH FEEDBACK",
@@ -884,7 +889,7 @@ class CronMonitorSystem:
     async def _send_priority_alert(self, opportunities: List[AlertOpportunity]):
         """Send priority email alert"""
         try:
-            subject = f"⚡ PRIORITY: {len(opportunities)} AI x Blockchain Engagement Opportunities"
+            subject = f"⚡ PRIORITY: {len(opportunities)} AI x Blockchain Engagement Opportunities [{SYSTEM_VERSION}]"
             
             html_content = self._generate_alert_html(
                 "PRIORITY OPPORTUNITIES",
@@ -1102,6 +1107,10 @@ class CronMonitorSystem:
             <title>AI x Blockchain KOL Opportunities</title>
         </head>
         <body style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
+            <div style="background: #007bff; color: white; padding: 8px 15px; border-radius: 5px; margin-bottom: 20px; text-align: center; font-weight: bold;">
+                🤖 System Version: {SYSTEM_VERSION} (Feature Branch - Authentic Voice)
+            </div>
+            
             <h1 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">
                 {alert_type}
             </h1>
@@ -1407,6 +1416,10 @@ class CronMonitorSystem:
             <title>AI x Blockchain Opportunities + Original Content</title>
         </head>
         <body style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
+            <div style="background: #007bff; color: white; padding: 8px 15px; border-radius: 5px; margin-bottom: 20px; text-align: center; font-weight: bold;">
+                🤖 System Version: {SYSTEM_VERSION} (Feature Branch - Authentic Voice)
+            </div>
+            
             <h1 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">
                 🎯 AI x Blockchain Opportunities + Original Content
             </h1>
@@ -1673,29 +1686,28 @@ class CronMonitorSystem:
                 current_vibe = self.keyword_rotator.get_current_vibe()
                 current_narratives = self.keyword_rotator.current_narratives["primary"][:3]
                 
-                prompt = f"""
-                Generate an original tweet about current trends at the intersection of Uniswap v4, Unichain, and AI.
+                prompt = """
+                Generate an authentic tweet as a SingleDivorcedDad sprotogremlin who works in crypto.
                 
-                Voice: Technical authority with relaxed crypto-native vibe
-                Style: Forward-thinking, conversational, no hashtags, clean text only
-                Length: Max 280 characters
-                Current Vibe: {current_vibe}
-                Hot Topics: {', '.join(current_narratives)}
+                Voice characteristics:
+                - Sprotogremlin energy: slightly chaotic, degen, but knowledgeable
+                - 42-year-old single dad wisdom mixed with crypto gremlin vibes
+                - Technical knowledge but expressed casually, not like a press release
+                - Slightly unhinged but endearing dad energy
+                - NO corporate speak, NO buzzwords, NO "alpha opportunities"
                 
-                IMPORTANT RULES:
-                - Always use lowercase "v4" when referring to Uniswap v4
-                - Use "Uniswap ecosystem/community/foundation/labs" instead of just "Uniswap"
-                - Address readers as "chat" if needed, not "anon" or "fam"
-                - Keep tone relaxed and approachable, not rigid
-                - Incorporate the current vibe: {current_vibe}
+                Topics to choose from:
+                - Dad life meets crypto chaos
+                - Random crypto observations while doing dad stuff
+                - Slightly technical takes but in gremlin language
+                - Life lessons applied to defi/crypto
+                - Overemployed dad managing crypto and kids
                 
-                Focus on one of these trending angles:
-                - AI-powered MEV protection on v4
-                - Autonomous trading agents on Unichain
-                - Intelligent hook architecture in the Uniswap ecosystem
-                - Predictive routing optimization
-                - Cross-chain AI coordination
-                - {current_narratives[0] if current_narratives else 'emerging tech'}
+                Style:
+                - Conversational and relatable
+                - No hashtags, no emojis
+                - Max 280 characters
+                - Sound like a real person, not a bot
                 
                 Return only the tweet text, no additional formatting.
                 """
@@ -1720,27 +1732,27 @@ class CronMonitorSystem:
                 }
             
             elif content_type == "unhinged_take":
-                # Generate provocative engagement bait
+                # Generate sprotogremlin unhinged take
                 prompt = """
-                Generate a slightly unhinged hot take about AI x blockchain that will get people talking.
+                Generate a slightly unhinged sprotogremlin take as a SingleDivorcedDad who works in crypto.
                 
-                Voice: Confident crypto native with bold predictions but relaxed tone
-                Style: Provocative but intelligent, conversational, no hashtags
+                Voice: Chaotic gremlin energy with dad wisdom
+                Style: Slightly unhinged but endearing, no corporate speak
                 Length: Max 280 characters
                 
-                IMPORTANT RULES:
-                - Always use lowercase "v4" when referring to Uniswap v4
-                - Use "Uniswap ecosystem/community/foundation/labs" instead of just "Uniswap"
-                - Address readers as "chat" if needed, not "anon" or "fam"
-                - Keep tone relaxed even when making bold claims
+                Examples of authentic gremlin energy:
+                - Random observations that are oddly insightful
+                - Dad analogies applied to crypto in weird ways
+                - Slightly chaotic takes that somehow make sense
+                - Overemployed dad managing too many things at once
                 
-                Examples of the vibe:
-                - "Hot take chat: AI agents will eat 90% of DEX volume within 18 months"
-                - "Unpopular opinion: Manual trading will look as primitive as using dial-up internet"
-                - "Bold prediction: Unichain + AI = the death of centralized exchanges"
-                - "Listen chat, v4 hooks + AI agents = game over for traditional AMMs"
+                DO NOT use:
+                - "Hot take:" or "Unpopular opinion:"
+                - Technical jargon without context
+                - Buzzwords like "alpha" or "ecosystem"
+                - Anything that sounds like marketing
                 
-                Make it controversial enough to drive engagement but technically grounded.
+                Sound like a real person having a random thought, not a crypto influencer.
                 Return only the tweet text.
                 """
                 

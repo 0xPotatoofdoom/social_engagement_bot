@@ -38,6 +38,9 @@ class OpportunityFeedback:
     what_could_improve: Optional[str] = None
     voice_adjustments_needed: Optional[List[str]] = None
     
+    # User improvement suggestions
+    user_improvement_suggestions: Optional[List[str]] = None
+    
     def to_dict(self) -> Dict:
         return asdict(self)
     
@@ -212,6 +215,36 @@ class FeedbackTracker:
             opportunity_id=opportunity_id,
             version=selected_version,
             custom_used=bool(custom_reply)
+        )
+        
+        return True
+    
+    def record_improvement_suggestion(self, opportunity_id: str, suggestion: str, context: str = None):
+        """Record user improvement suggestion for an opportunity"""
+        if opportunity_id not in self.pending_feedback:
+            logger.warning(f"Opportunity ID {opportunity_id} not found in pending feedback")
+            return False
+        
+        feedback = self._get_or_create_feedback(opportunity_id)
+        
+        # Initialize the list if it doesn't exist
+        if feedback.user_improvement_suggestions is None:
+            feedback.user_improvement_suggestions = []
+        
+        # Add the new suggestion with timestamp
+        timestamped_suggestion = f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] {suggestion}"
+        if context:
+            timestamped_suggestion += f" (Context: {context})"
+        
+        feedback.user_improvement_suggestions.append(timestamped_suggestion)
+        
+        self._save_feedback_data()
+        
+        logger.info(
+            "improvement_suggestion_recorded",
+            opportunity_id=opportunity_id,
+            suggestion_length=len(suggestion),
+            total_suggestions=len(feedback.user_improvement_suggestions)
         )
         
         return True

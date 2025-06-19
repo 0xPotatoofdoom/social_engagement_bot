@@ -7,13 +7,11 @@ rate limiting, and logging for feedback loop optimization.
 
 import tweepy
 import asyncio
-import logging
 import time
 from datetime import datetime, timedelta
-from typing import Optional, Dict, List, Any, Union
+from typing import Optional, Dict, List
 from collections import defaultdict
-import structlog
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 # Import enhanced logging
 from bot.utils.logging_config import get_x_api_logger
