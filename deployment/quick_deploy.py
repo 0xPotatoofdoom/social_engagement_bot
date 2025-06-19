@@ -84,7 +84,8 @@ def build_and_run():
         'SMTP_SERVER': 'smtp.gmail.com',
         'SMTP_PORT': '587',
         'PYTHONPATH': '/app/src',
-        'PYTHONUNBUFFERED': '1'
+        'PYTHONUNBUFFERED': '1',
+        'FEEDBACK_BASE_URL': os.getenv('FEEDBACK_BASE_URL', 'http://localhost:8080')
     }
     
     for key, value in env_map.items():

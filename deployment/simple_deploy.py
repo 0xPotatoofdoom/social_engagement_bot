@@ -57,7 +57,8 @@ def run_container():
         '-e', 'SMTP_PORT=587',
         '-e', 'MONITORING_INTERVAL=1800',  # 30 minutes
         '-e', 'PYTHONPATH=/app/src',
-        '-e', 'PYTHONUNBUFFERED=1'
+        '-e', 'PYTHONUNBUFFERED=1',
+        '-e', f'FEEDBACK_BASE_URL={os.getenv("FEEDBACK_BASE_URL", "http://localhost:8080")}'
     ])
     
     cmd = [

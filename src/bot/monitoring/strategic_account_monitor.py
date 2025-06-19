@@ -175,7 +175,8 @@ class StrategicAccountMonitor:
         text = tweet.get('text', '').lower()
         relevant_keywords = [
             'v4', 'uniswap', 'hooks', 'unichain', 'ai agent', 
-            'mev', 'liquidity', 'protocol', 'smart contract'
+            'mev', 'liquidity', 'protocol', 'smart contract',
+            'uniswap ecosystem', 'uniswap community', 'uniswap foundation', 'uniswap labs'
         ]
         
         has_keyword = any(keyword in text for keyword in relevant_keywords)

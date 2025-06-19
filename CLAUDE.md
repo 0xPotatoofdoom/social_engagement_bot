@@ -122,10 +122,12 @@ curl http://localhost:8080/feedback/{id}/reply/primary  # Test reply tracking
 
 ### **✅ CURRENT VOICE PROFILE (Updated June 2025)**
 - **❌ NO HASHTAGS** - Completely removed from all AI-generated content
-- **🔥 Degen Sensibilities** - Crypto-native language with authentic edge
-- **💪 Technical Authority** - AI x blockchain expertise without academic fluff
-- **🗣️ Direct Communication** - Less corporate speak, more crypto confidence
-- **📝 Clean Content Focus** - Substance over formatting tricks
+- **👋 "Chat" Address** - Always use "chat" when addressing readers, never "anon" or "fam"
+- **📝 Lowercase "v4"** - Always use lowercase "v4" when referring to Uniswap v4
+- **🏛️ Specific Entities** - Use "Uniswap ecosystem/community/foundation/labs" not just "Uniswap"
+- **😌 Relaxed Tone** - Less rigid, more approachable crypto-native vibe
+- **💬 Conversational** - Natural, authentic voice like we're just scrolling and commenting
+- **🔥 Crypto-Native** - Organic use of DeFi terminology without forced degen-ness
 
 ### **🎯 TARGET VOICE EVOLUTION**
 - **Current Baseline**: Conversational (0.17) + Enthusiasm (0.13)
@@ -194,6 +196,9 @@ CLAUDE_API_KEY=your_claude_api_key
 SENDER_EMAIL=your_gmail_address
 SENDER_PASSWORD=your_app_password
 RECIPIENT_EMAIL=your_notification_email
+
+# Feedback URL Configuration (Replace with your VPS IP)
+FEEDBACK_BASE_URL=http://your-vps-ip:8080
 ```
 
 ### **Production Deployment Settings**
@@ -313,9 +318,50 @@ docker build -f deployment/Dockerfile.engagement -t x_engagement_bot .
 
 ---
 
+## 🔄 **CHRONICALLY ONLINE KEYWORD SYSTEM** (NEW)
+
+### **Dynamic Keyword Rotation**
+- **🎲 Organic Search Behavior**: Rotates between 3-6 keywords per cycle (feels natural)
+- **📊 Strategy Mix**: Mixed (35%), Focused (30%), Narrative (25%), Broad (10%)
+- **🚫 No Repetition**: Tracks last 50 searches to avoid duplicate keywords
+- **📈 Narrative Updates**: Refreshes trending topics every 4-6 hours
+- **🌊 Market Mood**: Adapts keywords based on market sentiment (bullish/accumulating/rotating)
+
+### **Expanded Keyword Pools**
+- **Core Tech**: v4 hooks, unichain, ai agents, mev protection, concentrated liquidity
+- **DeFi General**: yield farming, real yield, tvl, ve tokenomics, liquidity wars
+- **Trending Tech**: restaking, eigenlayer, modular blockchain, rollups, zk proofs
+- **Memecoins**: fair launch, stealth launch, degen plays, moonshot, rug pull
+- **Stablecoins**: usdc, dai, frax, stable pools, curve wars, bribes
+- **Market Vibes**: bull market, altseason, narrative shift, risk on, accumulation
+- **Culture**: gm, wagmi, probably nothing, diamond hands, btfd, fomo
+
+### **Search Pattern Examples**
+- **Narrative Check** (30%): "v4 hooks analysis", "autonomous agents thread"
+- **Memecoin Degen** (15%): "stealth launch gems", "moonshot plays"
+- **Technical Deep** (25%): "unichain architecture", "hook optimization"
+- **Yield Hunting** (15%): "real yield strategy", "stable farming apy"
+- **General Scroll** (15%): Random interesting combinations
+
+---
+
 ## 📈 **RECENT MAJOR IMPROVEMENTS** (June 2025)
 
-### **🎯 Strategic Account Monitoring Implementation (NEW)**
+### **🗣️ Voice Guidelines Update**
+- **✅ Chat Address**: Updated all prompts to use "chat" instead of "anon/fam"
+- **✅ Lowercase v4**: Enforced lowercase "v4" in all content generation
+- **✅ Specific Entities**: Always using "Uniswap ecosystem/community/foundation/labs"
+- **✅ Relaxed Tone**: Less rigid, more conversational and approachable
+- **✅ Organic Feel**: Content feels like natural crypto Twitter scrolling
+
+### **🎲 Chronically Online Behavior**
+- **✅ Dynamic Keywords**: Implemented KeywordRotator for organic search patterns
+- **✅ Search Variety**: 3-6 keywords per cycle, never the same count
+- **✅ Narrative Tracking**: Updates trending topics every 4-6 hours
+- **✅ Market Mood**: Incorporates current vibe (bullish/accumulating/rotating)
+- **✅ No Repetition**: Tracks search history to avoid duplicate patterns
+
+### **🎯 Strategic Account Monitoring Implementation**
 - **✅ TDD Development**: Built with 100% test coverage using Test-Driven Development
   - 7 unit tests covering core monitoring logic
   - 6 integration tests for API interactions
@@ -424,6 +470,10 @@ docker build -f deployment/Dockerfile.engagement -t x_engagement_bot .
 - ✅ Added comprehensive bot detection to filter automated/low-quality content
 - ✅ Implemented quality human discussion requirements for better opportunities
 - ✅ Updated keywords to focus on technical discussions and developer queries
+- ✅ Fixed email feedback URLs to use VPS IP instead of localhost
+- ✅ Implemented chronically online keyword rotation for organic search behavior
+- ✅ Updated voice to use "chat", lowercase "v4", and specific Uniswap entities
+- ✅ Added dynamic narrative tracking that updates every 4-6 hours
 
 **Quick Commands:**
 - Monitor feedback: `python scripts/analysis/view_feedback_analytics.py`

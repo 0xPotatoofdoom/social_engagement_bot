@@ -6,6 +6,7 @@ Continuous monitoring with intelligent email alerts for AI x blockchain opportun
 import asyncio
 import smtplib
 import json
+import random
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
@@ -18,6 +19,7 @@ import os
 # Import enhanced logging and feedback tracking
 from bot.utils.logging_config import get_monitoring_logger, get_email_logger
 from bot.analytics.feedback_tracker import get_feedback_tracker
+from bot.monitoring.keyword_rotator import get_keyword_rotator
 
 logger = get_monitoring_logger()
 
@@ -102,6 +104,10 @@ class CronMonitorSystem:
         # Email event logger and feedback tracker
         self.email_logger = get_email_logger()
         self.feedback_tracker = get_feedback_tracker()
+        self.keyword_rotator = get_keyword_rotator()
+        
+        # Track when we last updated trending narratives
+        self.last_narrative_update = datetime.now()
         
         self._load_alert_history()
         self._load_processed_opportunities()
@@ -381,6 +387,11 @@ class CronMonitorSystem:
         opportunities = []
         
         try:
+            # Occasionally update trending narratives (every 4-6 hours)
+            if datetime.now() - self.last_narrative_update > timedelta(hours=random.uniform(4, 6)):
+                await self._update_trending_narratives()
+                self.last_narrative_update = datetime.now()
+            
             # Get focused keywords for v4/Unichain/AI intersection
             ai_blockchain_keywords = self._get_focused_keywords()
             
@@ -672,19 +683,20 @@ class CronMonitorSystem:
             Suggested Approach: {opportunity.suggested_response_type}
             
             Voice Guidelines:
-            - AI x blockchain technical authority with degen sensibilities  
-            - Conversational yet authoritative - crypto-native language
-            - Forward-thinking innovation expert with edge
-            - Educational but confident - no academic fluff
+            - AI x blockchain technical authority with relaxed, crypto-native vibe
+            - Conversational and approachable - use "chat" when addressing readers
+            - Forward-thinking innovation expert with authentic edge
+            - Educational but confident - no academic fluff or rigid formality
             - NEVER use hashtags - they're not part of this voice
-            - More direct, less corporate speak
+            - Always use lowercase "v4" when referring to Uniswap v4
+            - Use specific terms: "Uniswap community/ecosystem/foundation/labs" not just "Uniswap"
             
             Generate a reply that:
             1. Demonstrates technical expertise in AI x blockchain convergence
             2. Adds unique value to the conversation  
             3. Positions as thought leader in the space
             4. Stays under 280 characters
-            5. Uses crypto-native language and degen vibes
+            5. Uses crypto-native language with relaxed, approachable tone
             6. NO HASHTAGS - clean text only
             
             Provide your response as JSON with these exact keys:
@@ -701,11 +713,13 @@ class CronMonitorSystem:
             async with self.claude_client:
                 voice_only = """
                 AI x blockchain technical authority voice:
-                - Conversational yet authoritative with degen edge
-                - Forward-thinking innovation expert - crypto-native language
-                - Educational but confident - no corporate fluff
+                - Conversational and approachable - use "chat" for addressing readers
+                - Forward-thinking innovation expert - relaxed crypto-native language
+                - Educational but confident - no corporate fluff or rigid tone
                 - NEVER use hashtags - clean text only
-                - More direct, less formal - embrace the degen mindset
+                - Always use lowercase "v4" for Uniswap v4
+                - Use "Uniswap community/ecosystem/foundation/labs" not just "Uniswap"
+                - Relaxed, authentic voice - less formal, more natural
                 """
                 
                 response = await self.claude_client.generate_content(
@@ -816,24 +830,10 @@ class CronMonitorSystem:
     
     def _generate_feedback_urls(self, opportunity: AlertOpportunity) -> Dict[str, str]:
         """Generate feedback URLs for opportunity quality rating and reply usage tracking"""
-        base_url = "http://localhost:8080/feedback"
         opp_id = opportunity.feedback_id or f"opp_{hash(opportunity.content_url) % 10000}"
         
-        return {
-            # Quality rating URLs
-            'excellent': f"{base_url}/{opp_id}/quality/5",
-            'good': f"{base_url}/{opp_id}/quality/4", 
-            'okay': f"{base_url}/{opp_id}/quality/3",
-            'poor': f"{base_url}/{opp_id}/quality/2",
-            'bad': f"{base_url}/{opp_id}/quality/1",
-            
-            # Reply usage tracking URLs
-            'used_primary': f"{base_url}/{opp_id}/reply/primary",
-            'used_alt1': f"{base_url}/{opp_id}/reply/alt1",
-            'used_alt2': f"{base_url}/{opp_id}/reply/alt2", 
-            'used_custom': f"{base_url}/{opp_id}/reply/custom",
-            'not_used': f"{base_url}/{opp_id}/reply/none"
-        }
+        # Use feedback tracker to generate URLs with proper base URL
+        return self.feedback_tracker.generate_feedback_urls(opp_id)
     
     async def _send_detailed_alert_with_original_content(self, opportunities: List[AlertOpportunity], original_content: Dict):
         """Send detailed email alert with opportunities + original content + comprehensive feedback tracking"""
@@ -1316,17 +1316,11 @@ class CronMonitorSystem:
         content_type = original_content.get('content_type', 'unknown')
         content_id = original_content.get('feedback_id', f"orig_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
         
-        # Generate feedback URLs for original content
-        base_url = "http://localhost:8080/feedback"
-        original_feedback_urls = {
-            'excellent': f"{base_url}/{content_id}/quality/5",
-            'good': f"{base_url}/{content_id}/quality/4",
-            'okay': f"{base_url}/{content_id}/quality/3", 
-            'poor': f"{base_url}/{content_id}/quality/2",
-            'bad': f"{base_url}/{content_id}/quality/1",
-            'used': f"{base_url}/{content_id}/reply/posted",
-            'not_used': f"{base_url}/{content_id}/reply/none"
-        }
+        # Generate feedback URLs for original content using feedback tracker
+        original_feedback_urls = self.feedback_tracker.generate_feedback_urls(content_id)
+        # Add special URLs for original content
+        original_feedback_urls['used'] = original_feedback_urls.get('used_primary', '#')
+        original_feedback_urls['not_used'] = original_feedback_urls.get('not_used', '#')
         
         original_html = f"""
         <div style="border: 2px solid #e74c3c; margin: 20px 0; padding: 20px; border-radius: 10px; background: #fff5f5;">
@@ -1600,32 +1594,73 @@ class CronMonitorSystem:
         self.monitoring_active = False
     
     def _get_focused_keywords(self) -> List[str]:
-        """Get focused keywords for Uniswap v4/Unichain/AI intersection - prioritizing technical discussions."""
-        return [
-            # Technical implementation discussions
-            "v4 hooks implementation",
-            "building on unichain",
-            "v4 hook examples",
-            "unichain development",
-            
-            # Specific technical questions/discussions
-            "how do v4 hooks work",
-            "unichain architecture",
-            "v4 liquidity management",
-            "implementing v4 strategies",
-            
-            # Advanced technical concepts
-            "v4 custom amm curves",
-            "unichain tee validation",
-            "v4 dynamic fees",
-            "unichain block building",
-            
-            # Developer-focused terms
-            "v4 hook tutorial",
-            "unichain sdk",
-            "v4 solidity patterns",
-            "debugging v4 hooks"
+        """Get dynamic keywords using rotation strategy for organic search behavior"""
+        # Randomly choose strategy to feel more organic
+        strategies = [
+            ("focused", 0.3),     # Core AI x blockchain focus
+            ("narrative", 0.25),  # Follow current narratives  
+            ("mixed", 0.35),      # Organic mix - most realistic
+            ("broad", 0.1)        # Occasionally go broad
         ]
+        
+        strategy = random.choices(
+            [s[0] for s in strategies],
+            weights=[s[1] for s in strategies]
+        )[0]
+        
+        # Get 3-6 keywords to feel natural (not always the same number)
+        keyword_count = random.randint(3, 6)
+        
+        keywords = self.keyword_rotator.get_search_keywords(
+            count=keyword_count,
+            strategy=strategy
+        )
+        
+        logger.info(f"Selected {len(keywords)} keywords with {strategy} strategy", 
+                   keywords=keywords[:3] + ["..."] if len(keywords) > 3 else keywords)
+        
+        return keywords
+    
+    async def _update_trending_narratives(self):
+        """Update trending narratives based on recent activity"""
+        logger.info("Updating trending narratives based on recent activity")
+        
+        # This would ideally analyze recent high-engagement tweets
+        # For now, we'll rotate through predefined narrative sets
+        narrative_sets = [
+            {
+                "primary": ["v4 hooks", "autonomous agents", "mev protection"],
+                "secondary": ["restaking yields", "modular defi", "cross-chain"],
+                "emerging": ["intents", "account abstraction", "zk coprocessors"]
+            },
+            {
+                "primary": ["ai trading bots", "on-chain ai", "predictive routing"],
+                "secondary": ["real yield", "ve tokenomics", "liquidity wars"],
+                "emerging": ["based rollups", "preconfirmations", "blob markets"]
+            },
+            {
+                "primary": ["unichain launch", "hook marketplace", "concentrated liquidity"],
+                "secondary": ["stablecoin yields", "delta neutral", "perp dexes"],
+                "emerging": ["social trading", "copy trading", "prediction markets"]
+            }
+        ]
+        
+        # Pick a narrative set with some randomness
+        narrative_set = random.choice(narrative_sets)
+        
+        # Add some trending topics based on "market mood"
+        market_moods = ["bullish", "crabbing", "accumulating", "rotating"]
+        current_mood = random.choice(market_moods)
+        
+        if current_mood == "bullish":
+            narrative_set["primary"].append("moonshot plays")
+            narrative_set["secondary"].append("leverage farming")
+        elif current_mood == "accumulating":
+            narrative_set["primary"].append("value plays")
+            narrative_set["secondary"].append("stable farming")
+            
+        self.keyword_rotator.update_trending_narratives(narrative_set)
+        logger.info(f"Updated narratives with {current_mood} market mood")
     
     async def _generate_original_content(self, content_type: str = "trending_topic") -> Dict:
         """Generate original content for trending topics or unhinged takes."""
@@ -1634,19 +1669,33 @@ class CronMonitorSystem:
         try:
             if content_type == "trending_topic":
                 # Generate content based on current trends in v4/Unichain/AI space
-                prompt = """
+                # Get current vibe for more organic content
+                current_vibe = self.keyword_rotator.get_current_vibe()
+                current_narratives = self.keyword_rotator.current_narratives["primary"][:3]
+                
+                prompt = f"""
                 Generate an original tweet about current trends at the intersection of Uniswap v4, Unichain, and AI.
                 
-                Voice: Technical authority with crypto-native degen sensibilities
-                Style: Forward-thinking, no hashtags, clean text only
+                Voice: Technical authority with relaxed crypto-native vibe
+                Style: Forward-thinking, conversational, no hashtags, clean text only
                 Length: Max 280 characters
+                Current Vibe: {current_vibe}
+                Hot Topics: {', '.join(current_narratives)}
+                
+                IMPORTANT RULES:
+                - Always use lowercase "v4" when referring to Uniswap v4
+                - Use "Uniswap ecosystem/community/foundation/labs" instead of just "Uniswap"
+                - Address readers as "chat" if needed, not "anon" or "fam"
+                - Keep tone relaxed and approachable, not rigid
+                - Incorporate the current vibe: {current_vibe}
                 
                 Focus on one of these trending angles:
                 - AI-powered MEV protection on v4
                 - Autonomous trading agents on Unichain
-                - Intelligent hook architecture
+                - Intelligent hook architecture in the Uniswap ecosystem
                 - Predictive routing optimization
                 - Cross-chain AI coordination
+                - {current_narratives[0] if current_narratives else 'emerging tech'}
                 
                 Return only the tweet text, no additional formatting.
                 """
@@ -1661,7 +1710,7 @@ class CronMonitorSystem:
                     content = response['content'][0]['text'].strip()
                 else:
                     # Fallback trending content
-                    content = "The convergence of AI agents and v4 hooks is creating entirely new design patterns for autonomous DEX infrastructure. We're entering a new era of intelligent protocols."
+                    content = "The convergence of AI agents and v4 hooks is creating entirely new design patterns for autonomous DEX infrastructure in the Uniswap ecosystem. Chat, we're entering a new era of intelligent protocols."
                 
                 return {
                     'content_type': 'trending_topic',
@@ -1675,14 +1724,21 @@ class CronMonitorSystem:
                 prompt = """
                 Generate a slightly unhinged hot take about AI x blockchain that will get people talking.
                 
-                Voice: Confident crypto degen with bold predictions
-                Style: Provocative but intelligent, no hashtags
+                Voice: Confident crypto native with bold predictions but relaxed tone
+                Style: Provocative but intelligent, conversational, no hashtags
                 Length: Max 280 characters
                 
+                IMPORTANT RULES:
+                - Always use lowercase "v4" when referring to Uniswap v4
+                - Use "Uniswap ecosystem/community/foundation/labs" instead of just "Uniswap"
+                - Address readers as "chat" if needed, not "anon" or "fam"
+                - Keep tone relaxed even when making bold claims
+                
                 Examples of the vibe:
-                - "Hot take: AI agents will eat 90% of DEX volume within 18 months"
+                - "Hot take chat: AI agents will eat 90% of DEX volume within 18 months"
                 - "Unpopular opinion: Manual trading will look as primitive as using dial-up internet"
                 - "Bold prediction: Unichain + AI = the death of centralized exchanges"
+                - "Listen chat, v4 hooks + AI agents = game over for traditional AMMs"
                 
                 Make it controversial enough to drive engagement but technically grounded.
                 Return only the tweet text.
@@ -1698,7 +1754,7 @@ class CronMonitorSystem:
                     content = response['content'][0]['text'].strip()
                 else:
                     # Fallback unhinged take
-                    content = "Hot take: AI agents on Unichain will make manual trading look like using a fax machine in 2024. The infrastructure shift is already happening, most just don't see it yet."
+                    content = "Hot take chat: AI agents on Unichain will make manual trading look like using a fax machine in 2024. The infrastructure shift in the Uniswap ecosystem is already happening, most just don't see it yet."
                 
                 return {
                     'content_type': 'unhinged_take',

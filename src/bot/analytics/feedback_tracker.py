@@ -4,6 +4,7 @@ Tracks opportunity quality ratings and reply version selections to improve voice
 """
 
 import json
+import os
 import uuid
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
@@ -232,8 +233,12 @@ class FeedbackTracker:
         self.feedback_data.append(feedback)
         return feedback
     
-    def generate_feedback_urls(self, opportunity_id: str, base_url: str = "http://localhost:8080") -> Dict[str, str]:
+    def generate_feedback_urls(self, opportunity_id: str, base_url: str = None) -> Dict[str, str]:
         """Generate feedback URLs for email alerts"""
+        # Use environment variable if base_url not provided
+        if base_url is None:
+            base_url = os.getenv('FEEDBACK_BASE_URL', 'http://localhost:8080')
+        
         feedback_urls = {
             # Quality rating URLs
             'excellent': f"{base_url}/feedback/{opportunity_id}/quality/5",

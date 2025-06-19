@@ -127,7 +127,12 @@ RECIPIENT_EMAIL=your_notification_email
 PYTHONPATH=/app/src
 PYTHONUNBUFFERED=1
 TZ=America/New_York
+
+# Feedback URL Configuration (Replace with your VPS IP)
+FEEDBACK_BASE_URL=http://your-vps-ip:8080
 ```
+
+**Important**: Replace `your-vps-ip` with your actual VPS IP address. This URL will be used in email alerts for feedback buttons.
 
 ### **Set Proper Permissions**
 ```bash

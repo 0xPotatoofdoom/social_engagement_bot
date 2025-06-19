@@ -1,6 +1,16 @@
-# Voice and Brand Guidelines
+# Voice and Brand Guidelines (Updated June 2025)
 
 ## 🎭 Brand Voice Framework
+
+### Core Voice Updates
+
+**Critical Voice Rules:**
+- **Always use "chat"** when addressing readers (never "anon", "fam", or similar)
+- **Always lowercase "v4"** when referring to Uniswap v4
+- **Use specific entities**: "Uniswap ecosystem/community/foundation/labs" not just "Uniswap"
+- **Relaxed tone**: Less rigid, more conversational and approachable
+- **No hashtags**: Clean content without hashtag spam
+- **Chronically online feel**: Natural, like we're constantly scrolling and commenting
 
 ### Voice Profile Definition
 
@@ -60,14 +70,14 @@ brand_voice:
 
 ```markdown
 **Good Examples:**
-- "The most fascinating part of web3 adoption isn't the tech—it's watching communities form around shared beliefs rather than geography."
-- "Unpopular opinion: The best developers I know spend more time deleting code than writing it."
-- "Been tracking DeFi yields for 6 months. The pattern that emerges is pretty counterintuitive..."
+- "Chat, the most fascinating part of v4 hooks isn't the tech—it's watching the Uniswap community build entirely new DeFi patterns"
+- "Unpopular opinion: The best v4 developers in the Uniswap ecosystem spend more time deleting code than writing it"
+- "Been tracking yields across the Uniswap ecosystem for 6 months. Chat, the pattern that emerges is pretty counterintuitive..."
 
 **Avoid:**
-- "Web3 is revolutionary and will change everything!" (too hyperbolic)
-- "HUGE announcement coming soon!" (empty hype)
-- "This will disrupt the entire industry!" (overused tech speak)
+- "V4 is revolutionary and Uniswap will change everything!" (capitalized V4, generic "Uniswap")
+- "HUGE announcement coming soon anons!" (empty hype, using "anons")
+- "This will disrupt the entire industry fam!" (overused tech speak, using "fam")
 ```
 
 ### Trend Response Voice

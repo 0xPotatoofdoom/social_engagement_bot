@@ -842,5 +842,165 @@
         "type": "technical_discussion|breakthrough_announcement|collaboration"
       }
     ]
+  },
+  {
+    "timestamp": "2025-06-18T17:04:38.951490",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": true,
+    "opportunity_ids": [
+      "keyword_search_uniswap_v4_hooks_1935442829477921180"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "keyword_search_uniswap_v4_hooks",
+        "score": 0.8,
+        "type": "technical_discussion|collaboration"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-18T17:35:28.784684",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": true,
+    "opportunity_ids": [
+      "keyword_search_uniswap_v4_hooks_1935445099103543514"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "keyword_search_uniswap_v4_hooks",
+        "score": 0.8250000000000001,
+        "type": "breakthrough_announcement"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-18T19:25:24.735209",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": false,
+    "opportunity_ids": [
+      "b652410b_20250618_19"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "SYSTEM_STARTUP",
+        "score": 0.85,
+        "type": "system_startup_verification"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-18T19:26:17.009779",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": false,
+    "opportunity_ids": [
+      "b652410b_20250618_19"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "SYSTEM_STARTUP",
+        "score": 0.85,
+        "type": "system_startup_verification"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-18T19:27:09.106782",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": false,
+    "opportunity_ids": [
+      "keyword_search_v4_liquidity_management_1935438225725624386"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "keyword_search_v4_liquidity_management",
+        "score": 0.7700000000000001,
+        "type": "technical_discussion"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-18T19:42:44.756136",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": false,
+    "opportunity_ids": [
+      "b652410b_20250618_19"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "SYSTEM_STARTUP",
+        "score": 0.85,
+        "type": "system_startup_verification"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-18T19:45:31.000072",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": false,
+    "opportunity_ids": [
+      "b652410b_20250618_19"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "SYSTEM_STARTUP",
+        "score": 0.85,
+        "type": "system_startup_verification"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-18T19:48:08.732929",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": false,
+    "opportunity_ids": [
+      "b652410b_20250618_19"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "SYSTEM_STARTUP",
+        "score": 0.85,
+        "type": "system_startup_verification"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-18T20:02:34.973756",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": false,
+    "opportunity_ids": [
+      "b652410b_20250618_20"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "SYSTEM_STARTUP",
+        "score": 0.85,
+        "type": "system_startup_verification"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-06-18T20:16:04.093021",
+    "type": "detailed_with_unhinged_take",
+    "opportunity_count": 1,
+    "work_hours": false,
+    "opportunity_ids": [
+      "b652410b_20250618_20"
+    ],
+    "opportunity_summary": [
+      {
+        "account": "SYSTEM_STARTUP",
+        "score": 0.85,
+        "type": "system_startup_verification"
+      }
+    ]
   }
 ]
